@@ -18,6 +18,7 @@ interface Props {
     cultives: Cultive[];
     selectedStationId: string;
     onStationChange: (stationId: string) => void;
+    error?: string | null;
 }
 
 export const FenologicForm = ({
@@ -26,7 +27,8 @@ export const FenologicForm = ({
     stations,
     cultives,
     selectedStationId,
-    onStationChange
+    onStationChange,
+    error
 }: Props) => {
     // Filtrar cultivos por estación seleccionada
     const filteredCultives = selectedStationId
@@ -40,7 +42,13 @@ export const FenologicForm = ({
 
                 {showSuccess && (
                     <div className="success-message">
-                        <p>Los datos fueron enviados</p>
+                        ✅ Fenología creada correctamente.
+                    </div>
+                )}
+
+                {error && (
+                    <div className="error-message">
+                        ⚠️ {error}
                     </div>
                 )}
 

@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { useGet } from "../hooks/useGet";
-import { usePost } from "../hooks/usePost";
-import { FenologicForm } from "../components/Forms/FenologicForm/FenologicForm";
+import { useGet } from "../../hooks/useGet";
+import { usePost } from "../../hooks/usePost";
+import { FenologicForm } from "../../components/Forms/FenologicForm/FenologicForm";
 import { Link } from "react-router-dom";
-import '../App.css';
 
 interface Station {
     id: string;
@@ -21,7 +20,7 @@ const CreateFenologicPage = () => {
 
     const { data: stations } = useGet<Station[]>("http://localhost:3000/station");
     const { data: cultives } = useGet<Cultive[]>("http://localhost:3000/cultive");
-    const { post, showSuccess } = usePost("http://localhost:3000/fenologic/create-fenologic");
+    const { post, showSuccess, error } = usePost("http://localhost:3000/fenologic/create-fenologic");
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -39,6 +38,7 @@ const CreateFenologicPage = () => {
                 cultives={cultives || []}
                 selectedStationId={selectedStationId}
                 onStationChange={setSelectedStationId}
+                error={error}
             />
 
             <div style={{ textAlign: 'center', marginTop: '20px' }}>
@@ -47,7 +47,7 @@ const CreateFenologicPage = () => {
                 </Link>
             </div>
         </>
-    )
-}
+    );
+};
 
-export default CreateFenologicPage
+export default CreateFenologicPage;

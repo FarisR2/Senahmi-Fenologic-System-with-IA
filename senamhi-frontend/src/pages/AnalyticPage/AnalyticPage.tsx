@@ -1,8 +1,7 @@
-import { useGet } from "../hooks/useGet";
-import { usePost } from "../hooks/usePost";
-import { AnalyticForm } from "../components/Forms/AnalyticForm/AnalyticForm";
+import { useGet } from "../../hooks/useGet";
+import { usePost } from "../../hooks/usePost";
+import { AnalyticForm } from "../../components/Forms/AnalyticForm/AnalyticForm";
 import { Link } from "react-router-dom";
-import '../App.css';
 
 interface Station {
     id: string;

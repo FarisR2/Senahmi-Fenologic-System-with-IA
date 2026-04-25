@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
-import Sidebar from './Sidebar';
-import Navbar from './Navbar';
-import './Dashboard.css';
+import Sidebar from '../Sidebar/Sidebar';
+import Navbar from '../Navbar/Navbar';
+import './DashboardLayout.css';
 
 interface DashboardLayoutProps {
     children: ReactNode;
@@ -11,21 +11,14 @@ interface DashboardLayoutProps {
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    const toggleSidebar = () => {
-        setSidebarOpen(!sidebarOpen);
-    };
-
-    const closeSidebar = () => {
-        setSidebarOpen(false);
-    };
+    const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+    const closeSidebar = () => setSidebarOpen(false);
 
     return (
         <div className="dashboard-layout">
             <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
-
             <div className="dashboard-main">
                 <Navbar onToggleSidebar={toggleSidebar} />
-
                 <main className="dashboard-content">
                     {children}
                 </main>

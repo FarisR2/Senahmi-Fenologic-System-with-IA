@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { BaseService } from '../base.service';
 import { Cultive } from '../../interfaces/cultive.interface';
 import { CreateCultiveDto } from '../../dto/cultive/create-cultive.dto';
@@ -15,8 +15,19 @@ export class CultiveService extends BaseService<Cultive> {
   }
 
   createCultive(dto: CreateCultiveDto): Cultive {
-
     const foundStation = this.stationService.findOne(dto.stationId);
+
+    // Validación: no puede existir el mismo cultivo en la misma estación
+    const exists = this.items.some(
+      (c) =>
+        c.stationId === dto.stationId &&
+        c.nameCultive.trim().toLowerCase() === dto.nameCultive.trim().toLowerCase()
+    );
+    if (exists) {
+      throw new ConflictException(
+        `El cultivo "${dto.nameCultive}" ya existe en la estación "${foundStation.nameStation}".`
+      );
+    }
 
     const newCultive: Cultive = {
       id: uuid(),
@@ -27,7 +38,6 @@ export class CultiveService extends BaseService<Cultive> {
     };
 
     this.items.push(newCultive);
-
     return newCultive;
   }
 

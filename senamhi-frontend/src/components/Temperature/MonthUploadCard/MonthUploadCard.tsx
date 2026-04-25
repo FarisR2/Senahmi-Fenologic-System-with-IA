@@ -4,7 +4,7 @@ import { FaUpload, FaCheckCircle, FaFileExcel } from 'react-icons/fa';
 import './MonthUploadCard.css';
 
 interface MonthUploadCardProps {
-    month: number;        // 1-12
+    month: number;
     year: number;
     stationId: string;
     isUploaded: boolean;
@@ -37,7 +37,6 @@ const MonthUploadCard = ({
         }
 
         setUploading(true);
-
         const reader = new FileReader();
         reader.onload = async (event) => {
             try {
@@ -45,9 +44,6 @@ const MonthUploadCard = ({
                 const workbook = XLSX.read(data, { type: 'array' });
                 const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
                 const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 }) as any[][];
-
-                // Aquí iría la lógica de extracción de datos
-                // Por ahora, pasamos los datos al componente padre
                 await onUpload(month, year, jsonData);
                 onUploadSuccess();
             } catch (err) {
@@ -55,11 +51,9 @@ const MonthUploadCard = ({
                 alert('Error al procesar el archivo Excel');
             } finally {
                 setUploading(false);
-                // Reset input
                 e.target.value = '';
             }
         };
-
         reader.readAsArrayBuffer(file);
     };
 
@@ -67,9 +61,7 @@ const MonthUploadCard = ({
         <div className={`month-upload-card ${isUploaded ? 'uploaded' : ''}`}>
             <div className="month-header">
                 <h3 className="month-name">{MONTH_NAMES[month - 1]}</h3>
-                {isUploaded && (
-                    <FaCheckCircle className="upload-status-icon" />
-                )}
+                {isUploaded && <FaCheckCircle className="upload-status-icon" />}
             </div>
 
             <div className="month-body">
@@ -94,13 +86,7 @@ const MonthUploadCard = ({
                 )}
             </div>
 
-            {/* Preparado para botones de actualizar/eliminar en el futuro */}
-            {isUploaded && (
-                <div className="month-actions">
-                    {/* <button className="action-btn update-btn">Actualizar</button> */}
-                    {/* <button className="action-btn delete-btn">Eliminar</button> */}
-                </div>
-            )}
+            {isUploaded && <div className="month-actions"></div>}
         </div>
     );
 };

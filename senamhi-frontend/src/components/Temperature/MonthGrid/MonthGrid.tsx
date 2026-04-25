@@ -1,5 +1,5 @@
-import MonthUploadCard from './MonthUploadCard';
-import './MonthUploadCard.css';
+import MonthUploadCard from '../MonthUploadCard/MonthUploadCard';
+import './MonthGrid.css';
 
 interface MonthGridProps {
     year: number;
@@ -18,13 +18,11 @@ const MonthGrid = ({
     onUploadSuccess,
     onUpload
 }: MonthGridProps) => {
-    // Dividir meses en dos columnas: 1-6 (izquierda), 7-12 (derecha)
     const leftMonths = [1, 2, 3, 4, 5, 6];
     const rightMonths = [7, 8, 9, 10, 11, 12];
 
     return (
         <div className="month-grid">
-            {/* Columna izquierda */}
             <div className="month-column">
                 {leftMonths.map((month) => (
                     <MonthUploadCard
@@ -39,8 +37,6 @@ const MonthGrid = ({
                     />
                 ))}
             </div>
-
-            {/* Columna derecha */}
             <div className="month-column">
                 {rightMonths.map((month) => (
                     <MonthUploadCard

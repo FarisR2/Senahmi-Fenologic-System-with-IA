@@ -1,11 +1,9 @@
-import { StationForm } from "../components/Forms/StationForm/StationForm";
-import { usePost } from "../hooks/usePost";
+import { StationForm } from "../../components/Forms/StationForm/StationForm";
+import { usePost } from "../../hooks/usePost";
 import { Link } from "react-router-dom";
-import '../App.css';
-
 
 const CreateStationPage = () => {
-    const { post, showSuccess } = usePost('http://localhost:3000/station/create-station')
+    const { post, showSuccess, error } = usePost('http://localhost:3000/station/create-station');
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -16,7 +14,7 @@ const CreateStationPage = () => {
 
     return (
         <>
-            <StationForm handleSubmit={handleSubmit} showSuccess={showSuccess} />
+            <StationForm handleSubmit={handleSubmit} showSuccess={showSuccess} error={error} />
 
             <div style={{ textAlign: 'center', marginTop: '20px' }}>
                 <Link to="/cultive">

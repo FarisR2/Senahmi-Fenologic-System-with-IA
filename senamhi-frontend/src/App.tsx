@@ -1,15 +1,14 @@
-import CreateStationPage from './pages/StationPage';
-import CreateCultivePage from './pages/CultivePage';
-import CreateFenologicPage from './pages/FenologicPage';
-import CreateAnalyticPage from './pages/AnalyticPage';
-import ChartPage from './pages/ChartPage';
-import { TemperatureUploadPage } from './pages/TemperatureUploadPage';
-import DashboardHome from './pages/DashboardHome';
-import DashboardLayout from './components/Dashboard/DashboardLayout';
+import CreateStationPage from './pages/StationPage/StationPage';
+import CreateCultivePage from './pages/CultivePage/CultivePage';
+import CreateFenologicPage from './pages/FenologicPage/FenologicPage';
+import CreateAnalyticPage from './pages/AnalyticPage/AnalyticPage';
+import ChartPage from './pages/ChartPage/ChartPage';
+import { TemperatureUploadPage } from './pages/TemperatureUploadPage/TemperatureUploadPage';
+import DashboardHome from './pages/DashboardHome/DashboardHome';
+import DashboardLayout from './components/Dashboard/DashboardLayout/DashboardLayout';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function App() {
-
   return (
     <BrowserRouter>
       <DashboardLayout>

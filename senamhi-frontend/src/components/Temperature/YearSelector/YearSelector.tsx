@@ -1,4 +1,4 @@
-import './MonthUploadCard.css';
+import './YearSelector.css';
 
 interface YearSelectorProps {
     selectedYear: number;
@@ -30,9 +30,7 @@ const YearSelector = ({
                 onChange={(e) => onYearChange(parseInt(e.target.value))}
             >
                 {years.map((year) => (
-                    <option key={year} value={year}>
-                        {year}
-                    </option>
+                    <option key={year} value={year}>{year}</option>
                 ))}
             </select>
         </div>

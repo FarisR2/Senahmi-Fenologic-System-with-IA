@@ -9,9 +9,10 @@ interface Props {
     handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
     showSuccess: boolean;
     stations: Station[];
+    error?: string | null;
 }
 
-export const CultiveForm = ({ handleSubmit, showSuccess, stations }: Props) => {
+export const CultiveForm = ({ handleSubmit, showSuccess, stations, error }: Props) => {
     return (
         <div className="cultive-form-container">
             <form onSubmit={handleSubmit}>
@@ -19,7 +20,13 @@ export const CultiveForm = ({ handleSubmit, showSuccess, stations }: Props) => {
 
                 {showSuccess && (
                     <div className="success-message">
-                        Los datos fueron enviados
+                        ✅ Cultivo creado correctamente.
+                    </div>
+                )}
+
+                {error && (
+                    <div className="error-message">
+                        ⚠️ {error}
                     </div>
                 )}
 

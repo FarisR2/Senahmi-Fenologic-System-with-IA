@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { BaseService } from '../base.service';
 import { Fenologic } from '../../interfaces/fenologic.interface';
 import { CreateFenologicDto } from '../../dto/fenologic/create-fenologic.dto';
@@ -14,6 +14,29 @@ export class FenologicService extends BaseService<Fenologic> {
   createFenologic(dto: CreateFenologicDto): Fenologic {
     const cultiveFound = this.cultiveService.findOne(dto.cultiveId);
 
+    // Validación: no puede existir la misma fenología (por nombre o abreviatura) en el mismo cultivo
+    const duplicateName = this.items.some(
+      (f) =>
+        f.cultiveId === dto.cultiveId &&
+        f.nameFenologic.trim().toLowerCase() === dto.nameFenologic.trim().toLowerCase()
+    );
+    if (duplicateName) {
+      throw new ConflictException(
+        `La fenología "${dto.nameFenologic}" ya existe para el cultivo "${cultiveFound.nameCultive}".`
+      );
+    }
+
+    const duplicateAbbr = this.items.some(
+      (f) =>
+        f.cultiveId === dto.cultiveId &&
+        f.abbreviation.trim().toLowerCase() === dto.abbreviation.trim().toLowerCase()
+    );
+    if (duplicateAbbr) {
+      throw new ConflictException(
+        `La abreviatura "${dto.abbreviation}" ya existe para el cultivo "${cultiveFound.nameCultive}".`
+      );
+    }
+
     const newFenologic: Fenologic = {
       id: uuid(),
       nameFenologic: dto.nameFenologic,
@@ -23,7 +46,6 @@ export class FenologicService extends BaseService<Fenologic> {
     };
 
     this.items.push(newFenologic);
-
     return newFenologic;
   }
 

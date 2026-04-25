@@ -1,6 +1,6 @@
 import { FaBars } from 'react-icons/fa';
 import { useLocation } from 'react-router-dom';
-import './Dashboard.css';
+import './Navbar.css';
 
 interface NavbarProps {
     onToggleSidebar: () => void;
@@ -9,7 +9,6 @@ interface NavbarProps {
 const Navbar = ({ onToggleSidebar }: NavbarProps) => {
     const location = useLocation();
 
-    // Mapeo de rutas a títulos
     const pageTitles: Record<string, string> = {
         '/': 'Dashboard',
         '/station': 'Gestión de Estaciones',
@@ -26,22 +25,11 @@ const Navbar = ({ onToggleSidebar }: NavbarProps) => {
     return (
         <header className="navbar">
             <div className="navbar-content">
-                {/* Botón menú móvil */}
-                <button
-                    className="navbar-menu-btn"
-                    onClick={onToggleSidebar}
-                    aria-label="Toggle menu"
-                >
+                <button className="navbar-menu-btn" onClick={onToggleSidebar} aria-label="Toggle menu">
                     <FaBars />
                 </button>
-
-                {/* Título de página */}
                 <h2 className="navbar-title">{currentTitle}</h2>
-
-                {/* Espacio para futuras acciones (usuario, notificaciones, etc.) */}
-                <div className="navbar-actions">
-                    {/* Placeholder para futuras funcionalidades */}
-                </div>
+                <div className="navbar-actions"></div>
             </div>
         </header>
     );
