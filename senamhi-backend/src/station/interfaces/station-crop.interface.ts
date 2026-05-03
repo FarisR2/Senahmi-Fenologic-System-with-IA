@@ -2,9 +2,9 @@ import { Cultive } from '../../cultive/interfaces/cultive.interface';
 import { Station } from './station.interface';
 
 export interface StationCrop {
-  id: string;
-  stationId: string;
+  id: number;
+  stationId: number;
   station: Station;
-  cultiveId: string;
+  cultiveId: number;
   cultive: Cultive;
 }

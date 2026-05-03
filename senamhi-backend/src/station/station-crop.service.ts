@@ -1,33 +1,32 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { BaseService } from '../common/services/base.service';
-import { StationCrop } from './interfaces/station-crop.interface';
+import { StationCrop as StationCropEntity } from './entities/station-crop.entity';
 import { StationCropDto } from './dto/create-station-crop.dto';
 import { CultiveService } from '../cultive/cultive.service';
-import { v4 as uuid } from 'uuid';
 import { StationService } from './station.service';
 
 @Injectable()
-export class StationCropService extends BaseService<StationCrop> {
+export class StationCropService extends BaseService<StationCropEntity> {
   constructor(
+    @InjectRepository(StationCropEntity)
+    private readonly stationCropRepository: Repository<StationCropEntity>,
     private readonly cultiveService: CultiveService,
     private readonly stationService: StationService,
   ) {
-    super();
+    super(stationCropRepository);
   }
-  createStationCrop(dto: StationCropDto): StationCrop {
-    const foundCultive = this.cultiveService.findOne(dto.cultiveId);
-    const foundStation = this.stationService.findOne(dto.stationId);
 
-    const newStationCrop: StationCrop = {
-      id: uuid(),
+  async createStationCrop(dto: StationCropDto): Promise<StationCropEntity> {
+    await this.cultiveService.findOne(dto.cultiveId);
+    await this.stationService.findOne(dto.stationId);
+
+    const newStationCrop = this.stationCropRepository.create({
       cultiveId: dto.cultiveId,
-      cultive: foundCultive,
       stationId: dto.stationId,
-      station: foundStation,
-    };
+    });
 
-    this.items.push(newStationCrop);
-
-    return newStationCrop;
+    return await this.stationCropRepository.save(newStationCrop);
   }
 }

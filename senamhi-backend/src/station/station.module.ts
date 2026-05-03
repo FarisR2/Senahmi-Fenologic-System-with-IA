@@ -6,10 +6,11 @@ import { StationCropService } from './station-crop.service';
 import { CultiveModule } from '../cultive/cultive.module';
 import { forwardRef } from '@nestjs/common';
 import { Station } from './entities/station.entity';
+import { StationCrop } from './entities/station-crop.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Station]),
+    TypeOrmModule.forFeature([Station, StationCrop]),
     forwardRef(() => CultiveModule)
   ],
   controllers: [StationController],

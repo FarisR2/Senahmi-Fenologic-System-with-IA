@@ -2,8 +2,8 @@
 import { Station } from "../../station/interfaces/station.interface";
 
 export interface TemperatureData {
-    id: string;
-    stationId: string;
+    id: number;
+    stationId: number;
     station: Station;
     month: number;  // 1-12
     year: number;   // 2025, etc.

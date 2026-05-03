@@ -1,59 +1,65 @@
-import { Injectable } from '@nestjs/common';
-import { v4 as uuid } from 'uuid';
-import { TemperatureData } from './interfaces/temperature-data.interface';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { TemperatureData as TemperatureDataEntity } from './entities/temperature-data.entity';
 import { CreateTemperatureDataDto } from './dto/create-temperature-data.dto';
 import { UpdateTemperatureDataDto } from './dto/update-temperature-data.dto';
 import { StationService } from '../station/station.service';
 
 @Injectable()
 export class TemperatureDataService {
-    private temperatureData: TemperatureData[] = [];
+    constructor(
+        @InjectRepository(TemperatureDataEntity)
+        private readonly temperatureDataRepository: Repository<TemperatureDataEntity>,
+        private readonly stationService: StationService
+    ) { }
 
-    constructor(private readonly stationService: StationService) { }
+    async createTemperatureData(dto: CreateTemperatureDataDto): Promise<TemperatureDataEntity> {
+        await this.stationService.findOne(dto.stationId);
 
-    async createTemperatureData(dto: CreateTemperatureDataDto): Promise<TemperatureData> {
-        const stationFound = await this.stationService.findOne(dto.stationId);
-        if (!stationFound) {
-            throw new Error('Station not found');
-        }
-
-        const newTempData: TemperatureData = {
-            id: uuid(),
+        const newTempData = this.temperatureDataRepository.create({
             stationId: dto.stationId,
-            station: stationFound,
             month: dto.month,
             year: dto.year,
             tempMaxValues: dto.tempMaxValues,
             tempMinValues: dto.tempMinValues,
             precipValues: dto.precipValues,
-        };
+        });
 
-        this.temperatureData.push(newTempData);
-        return newTempData;
+        return await this.temperatureDataRepository.save(newTempData);
     }
 
-    async findAll(): Promise<TemperatureData[]> {
-        return this.temperatureData;
+    async findAll(): Promise<TemperatureDataEntity[]> {
+        return await this.temperatureDataRepository.find({ relations: ['station'] });
     }
 
-    async findByStation(stationId: string): Promise<TemperatureData[]> {
-        return this.temperatureData.filter(td => td.stationId === stationId);
+    async findByStation(stationId: number): Promise<TemperatureDataEntity[]> {
+        return await this.temperatureDataRepository.find({
+            where: { stationId },
+            relations: ['station']
+        });
     }
 
-    async findByStationAndMonth(stationId: string, month: number, year: number): Promise<TemperatureData | undefined> {
-        return this.temperatureData.find(
-            td => td.stationId === stationId && td.month === month && td.year === year
-        );
+    async findByStationAndMonth(stationId: number, month: number, year: number): Promise<TemperatureDataEntity | null> {
+        return await this.temperatureDataRepository.findOne({
+            where: { stationId, month, year },
+            relations: ['station']
+        });
     }
 
-    async findOne(id: string): Promise<TemperatureData | undefined> {
-        return this.temperatureData.find(td => td.id === id);
+    async findOne(id: number): Promise<TemperatureDataEntity> {
+        const item = await this.temperatureDataRepository.findOne({
+            where: { id },
+            relations: ['station']
+        });
+        if (!item) throw new NotFoundException(`Temperature data with ID ${id} not found`);
+        return item;
     }
 
-    async getUploadedMonths(stationId: string, year: number): Promise<{ uploadedMonths: number[], files: Record<number, string> }> {
-        const data = this.temperatureData.filter(
-            td => td.stationId === stationId && td.year === year
-        );
+    async getUploadedMonths(stationId: number, year: number): Promise<{ uploadedMonths: number[], files: Record<number, string> }> {
+        const data = await this.temperatureDataRepository.find({
+            where: { stationId, year }
+        });
 
         const uploadedMonths = data.map(td => td.month);
         const files: Record<number, string> = {};
@@ -67,11 +73,8 @@ export class TemperatureDataService {
         return { uploadedMonths, files };
     }
 
-    async updateTemperatureData(id: string, dto: UpdateTemperatureDataDto): Promise<TemperatureData> {
+    async updateTemperatureData(id: number, dto: UpdateTemperatureDataDto): Promise<TemperatureDataEntity> {
         const tempData = await this.findOne(id);
-        if (!tempData) {
-            throw new Error('Temperature data not found');
-        }
 
         if (dto.tempMaxValues !== undefined) {
             tempData.tempMaxValues = dto.tempMaxValues;
@@ -83,14 +86,12 @@ export class TemperatureDataService {
             tempData.precipValues = dto.precipValues;
         }
 
-        return tempData;
+        return await this.temperatureDataRepository.save(tempData);
     }
 
-    async deleteTemperatureData(id: string): Promise<void> {
-        const index = this.temperatureData.findIndex(td => td.id === id);
-        if (index !== -1) {
-            this.temperatureData.splice(index, 1);
-        }
+    async deleteTemperatureData(id: number): Promise<void> {
+        const item = await this.findOne(id);
+        await this.temperatureDataRepository.remove(item);
     }
 }
 

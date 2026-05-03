@@ -1,9 +1,9 @@
-import { IsUUID } from 'class-validator';
+import { IsNumber } from 'class-validator';
 
 export class StationCropDto {
-  @IsUUID()
-  readonly cultiveId: string;
+  @IsNumber()
+  readonly cultiveId: number;
 
-  @IsUUID()
-  readonly stationId: string;
+  @IsNumber()
+  readonly stationId: number;
 }

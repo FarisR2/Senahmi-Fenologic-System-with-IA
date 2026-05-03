@@ -1,9 +1,9 @@
-import { IsUUID, IsNumber, IsArray, Min, Max } from 'class-validator';
+import { IsNumber, IsArray, Min, Max } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateTemperatureDataDto {
-    @IsUUID()
-    stationId: string;
+    @IsNumber()
+    stationId: number;
 
     @Type(() => Number)
     @IsNumber()

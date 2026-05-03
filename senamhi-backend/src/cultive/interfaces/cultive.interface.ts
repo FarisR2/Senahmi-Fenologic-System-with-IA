@@ -1,9 +1,9 @@
 import { Station } from "../../station/interfaces/station.interface";
 
 export interface Cultive {
-  id: string;
+  id: number;
   nameCultive: string;
-  stationId: string;
+  stationId: number;
   station: Station;
   dayInterval: number;
 }

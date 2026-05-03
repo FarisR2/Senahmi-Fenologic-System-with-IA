@@ -1,9 +1,9 @@
 import { Cultive } from '../../cultive/interfaces/cultive.interface';
 
 export interface Fenologic {
-  id: string;
+  id: number;
   nameFenologic: string;
   abbreviation: string;
-  cultiveId: string;
+  cultiveId: number;
   cultive: Cultive;
 }
