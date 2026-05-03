@@ -58,3 +58,30 @@ export function dateToISOWithNoonUTC(dateString: string): string {
 export function datesToISOArray(dates: string[]): string[] {
     return dates.map(d => dateToISOWithNoonUTC(d));
 }
+
+/**
+ * Calcula la diferencia de tiempo en un formato corto (ej: 10M, 2H, 1D)
+ */
+export function timeAgo(dateString: string | Date): string {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 0) {
+        // Es en el futuro (ej: Programado)
+        const futureDiff = Math.abs(diffInSeconds);
+        if (futureDiff < 3600) return `A LAS ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+        return `A LAS ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+    }
+
+    if (diffInSeconds < 60) return 'AHORA';
+    
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) return `${diffInMinutes}M`;
+    
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `${diffInHours}H`;
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    return `${diffInDays}D`;
+}

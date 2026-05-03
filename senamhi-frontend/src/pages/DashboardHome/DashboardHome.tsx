@@ -5,6 +5,7 @@ import { ModuleLinks } from '../../components/DashboardRedesign/ModuleLinks';
 import { ActivityFeed } from '../../components/DashboardRedesign/ActivityFeed';
 import type { ActivityItem } from '../../components/DashboardRedesign/ActivityFeed';
 import { HeatMap } from '../../components/DashboardRedesign/HeatMap';
+import { timeAgo } from '../../utils/dateUtils';
 
 import { 
     FaMapMarkerAlt, 
@@ -23,11 +24,25 @@ interface DashboardStats {
     fenologics: { count: number; label: string; tag: string; statusText: string };
 }
 
-const DashboardHome = () => {
-    // Container Logic: Fetching data from the new backend endpoint
-    const { data: stats, loading, error } = useGet<DashboardStats>('/dashboard/stats');
+// Interfaz para la entidad de backend
+interface BackendActivityLog {
+    id: number;
+    entityType: string;
+    entityId: number | null;
+    actionType: string;
+    status: string;
+    title: string;
+    description: string;
+    progress: number | null;
+    createdAt: string;
+}
 
-    // Static/Mocked data for Module Links (these just navigate to other views)
+const DashboardHome = () => {
+    // Container Logic: Fetching data from backend endpoints
+    const { data: stats, loading: loadingStats, error: errorStats } = useGet<DashboardStats>('/dashboard/stats');
+    const { data: logs, loading: loadingLogs, error: errorLogs } = useGet<BackendActivityLog[]>('/activity-logs/recent?limit=4');
+
+    // Static/Mocked data for Module Links
     const moduleLinks = [
         {
             title: 'Estaciones',
@@ -52,44 +67,46 @@ const DashboardHome = () => {
         }
     ];
 
-    // Static/Mocked data for Activity Feed since the backend endpoint for this doesn't exist yet
-    const recentActivities: ActivityItem[] = [
-        {
-            id: '1',
-            status: 'COMPLETADO',
-            timeText: '10M',
-            title: 'Fenología: Floración de Cultivo: Papa',
-            description: 'Se detectó el inicio masivo de floración en el clúster de Huancayo.',
-            icon: <FaCheckCircle />,
-            statusColor: 'green'
-        },
-        {
-            id: '2',
-            status: 'PROCESAMIENTO ACTIVO',
-            timeText: '',
-            title: 'Fenología: Maduración de Cultivo: Maíz',
-            description: 'Análisis de coloración de grano en el valle del Mantaro.',
-            progress: 80,
-            icon: <FaSync className="fa-spin" />,
-            statusColor: 'blue'
-        },
-        {
-            id: '3',
-            status: 'PROGRAMADO',
-            timeText: 'LAS 16:00',
-            title: 'Fenología: Siembra de Cultivo: Arroz',
-            description: 'Preparación del ciclo de monitoreo para la campaña norte.',
-            icon: <FaClock />,
-            statusColor: 'gray'
-        }
-    ];
+    // Mapeo dinámico de logs del backend hacia el formato del componente visual
+    const mapLogToActivityItem = (log: BackendActivityLog): ActivityItem => {
+        let icon = <FaCheckCircle />;
+        let statusColor: 'green' | 'blue' | 'gray' = 'gray';
+        let statusMap: ActivityItem['status'] = 'COMPLETADO';
 
-    if (loading) {
+        if (log.actionType === 'COMPLETED' || log.status === 'COMPLETADO') {
+            icon = <FaCheckCircle />;
+            statusColor = 'green';
+            statusMap = 'COMPLETADO';
+        } else if (log.actionType === 'PROCESSING' || log.status === 'PROCESAMIENTO ACTIVO') {
+            icon = <FaSync className="fa-spin" />;
+            statusColor = 'blue';
+            statusMap = 'PROCESAMIENTO ACTIVO';
+        } else if (log.actionType === 'SCHEDULED' || log.status === 'PROGRAMADO') {
+            icon = <FaClock />;
+            statusColor = 'gray';
+            statusMap = 'PROGRAMADO';
+        }
+
+        return {
+            id: log.id.toString(),
+            status: statusMap,
+            timeText: timeAgo(log.createdAt),
+            title: log.title,
+            description: log.description,
+            progress: log.progress !== null ? log.progress : undefined,
+            icon,
+            statusColor
+        };
+    };
+
+    const recentActivities: ActivityItem[] = logs ? logs.map(mapLogToActivityItem) : [];
+
+    if (loadingStats || loadingLogs) {
         return <div className="dashboard-loading">Cargando inteligencia agroclimática...</div>;
     }
 
-    if (error) {
-        return <div className="dashboard-error">Error al cargar datos: {error}</div>;
+    if (errorStats || errorLogs) {
+        return <div className="dashboard-error">Error al cargar datos: {errorStats || errorLogs}</div>;
     }
 
     return (

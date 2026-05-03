@@ -7,6 +7,7 @@ import { FenologicModule } from './fenologic/fenologic.module';
 import { AnalyticModule } from './analytic/analytic.module';
 import { TemperatureDataModule } from './temperature-data/temperature-data.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { ActivityLogModule } from './activity-log/activity-log.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     AnalyticModule,
     TemperatureDataModule,
     DashboardModule,
+    ActivityLogModule,
   ],
   providers: [],
 })
