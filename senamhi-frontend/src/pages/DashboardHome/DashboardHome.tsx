@@ -1,103 +1,141 @@
-import { Link } from 'react-router-dom';
-import {
-    FaMapMarkerAlt,
-    FaSeedling,
+import { useGet } from '../../hooks/useGet';
+import { HeroBanner } from '../../components/DashboardRedesign/HeroBanner';
+import { StatCard } from '../../components/DashboardRedesign/StatCard';
+import { ModuleLinks } from '../../components/DashboardRedesign/ModuleLinks';
+import { ActivityFeed, ActivityItem } from '../../components/DashboardRedesign/ActivityFeed';
+import { HeatMap } from '../../components/DashboardRedesign/HeatMap';
+
+import { 
+    FaMapMarkerAlt, 
+    FaSeedling, 
     FaLeaf,
-    FaThermometerHalf,
-    FaChartBar,
-    FaChartLine
+    FaCheckCircle,
+    FaSync,
+    FaClock
 } from 'react-icons/fa';
+
 import './DashboardHome.css';
 
+interface DashboardStats {
+    stations: { count: number; label: string; trend: string; statusText: string };
+    cultives: { count: number; label: string; tag: string; statusText: string };
+    fenologics: { count: number; label: string; tag: string; statusText: string };
+}
+
 const DashboardHome = () => {
-    const quickLinks = [
+    // Container Logic: Fetching data from the new backend endpoint
+    const { data: stats, loading, error } = useGet<DashboardStats>('/dashboard/stats');
+
+    // Static/Mocked data for Module Links (these just navigate to other views)
+    const moduleLinks = [
         {
             title: 'Estaciones',
-            description: 'Gestionar estaciones meteorológicas',
-            icon: FaMapMarkerAlt,
+            description: 'Gestión de red geoespacial y diagnóstico de salud de estaciones.',
+            icon: <FaMapMarkerAlt />,
             path: '/station',
-            color: '#3b82f6',
+            iconBgColor: '#1e3a8a'
         },
         {
             title: 'Cultivos',
-            description: 'Administrar tipos de cultivos',
-            icon: FaSeedling,
+            description: 'Censo agrícola y umbrales climáticos específicos por cultivo.',
+            icon: <FaSeedling />,
             path: '/cultive',
-            color: '#10b981',
+            iconBgColor: '#16a34a'
         },
         {
             title: 'Fenologías',
-            description: 'Configurar etapas fenológicas',
-            icon: FaLeaf,
+            description: 'Seguimiento de etapas desde germinación hasta cosecha.',
+            icon: <FaLeaf />,
             path: '/fenologic',
-            color: '#8b5cf6',
-        },
-        {
-            title: 'Temperaturas',
-            description: 'Cargar datos de temperatura',
-            icon: FaThermometerHalf,
-            path: '/temperature',
-            color: '#ef4444',
-        },
-        {
-            title: 'Analíticos',
-            description: 'Crear y gestionar analíticos',
-            icon: FaChartBar,
-            path: '/analytic',
-            color: '#f59e0b',
-        },
-        {
-            title: 'Gráficos',
-            description: 'Visualizar datos y tendencias',
-            icon: FaChartLine,
-            path: '/chart',
-            color: '#06b6d4',
-        },
+            iconBgColor: '#9a3412'
+        }
     ];
 
+    // Static/Mocked data for Activity Feed since the backend endpoint for this doesn't exist yet
+    const recentActivities: ActivityItem[] = [
+        {
+            id: '1',
+            status: 'COMPLETADO',
+            timeText: '10M',
+            title: 'Fenología: Floración de Cultivo: Papa',
+            description: 'Se detectó el inicio masivo de floración en el clúster de Huancayo.',
+            icon: <FaCheckCircle />,
+            statusColor: 'green'
+        },
+        {
+            id: '2',
+            status: 'PROCESAMIENTO ACTIVO',
+            timeText: '',
+            title: 'Fenología: Maduración de Cultivo: Maíz',
+            description: 'Análisis de coloración de grano en el valle del Mantaro.',
+            progress: 80,
+            icon: <FaSync className="fa-spin" />,
+            statusColor: 'blue'
+        },
+        {
+            id: '3',
+            status: 'PROGRAMADO',
+            timeText: 'LAS 16:00',
+            title: 'Fenología: Siembra de Cultivo: Arroz',
+            description: 'Preparación del ciclo de monitoreo para la campaña norte.',
+            icon: <FaClock />,
+            statusColor: 'gray'
+        }
+    ];
+
+    if (loading) {
+        return <div className="dashboard-loading">Cargando inteligencia agroclimática...</div>;
+    }
+
+    if (error) {
+        return <div className="dashboard-error">Error al cargar datos: {error}</div>;
+    }
+
     return (
-        <div className="dashboard-home">
-            <div className="dashboard-home-header">
-                <h1 className="dashboard-home-title">
-                    Bienvenido al Sistema SENAMHI
-                </h1>
-                <p className="dashboard-home-subtitle">
-                    Sistema de Análisis Agroclimático - Gestión integral de datos meteorológicos y fenológicos
-                </p>
-            </div>
-
-            <div className="dashboard-home-grid">
-                {quickLinks.map((link) => (
-                    <Link
-                        key={link.path}
-                        to={link.path}
-                        className="dashboard-card"
-                        style={{ '--card-color': link.color } as React.CSSProperties}
-                    >
-                        <div className="dashboard-card-icon">
-                            <link.icon />
-                        </div>
-                        <div className="dashboard-card-content">
-                            <h3 className="dashboard-card-title">{link.title}</h3>
-                            <p className="dashboard-card-description">{link.description}</p>
-                        </div>
-                        <div className="dashboard-card-arrow">→</div>
-                    </Link>
-                ))}
-            </div>
-
-            <div className="dashboard-home-footer">
-                <div className="dashboard-info-card">
-                    <h3>📊 Inicio Rápido</h3>
-                    <ol>
-                        <li>Crea una <strong>Estación</strong> meteorológica</li>
-                        <li>Define los <strong>Cultivos</strong> a analizar</li>
-                        <li>Configura las <strong>Fenologías</strong> correspondientes</li>
-                        <li>Carga los datos de <strong>Temperatura</strong></li>
-                        <li>Crea <strong>Analíticos</strong> con fechas fenológicas</li>
-                        <li>Visualiza los resultados en <strong>Gráficos</strong></li>
-                    </ol>
+        <div className="dashboard-redesign-container">
+            <div className="dashboard-main-content">
+                <HeroBanner 
+                    title="Monitor Nacional de Inteligencia Agroclimática"
+                    subtitle="Monitoreo de precisión en 24 regiones. La estabilidad atmosférica actual favorece el rendimiento de papa y maíz en la sierra central."
+                />
+                
+                <div className="dashboard-stats-grid">
+                    <StatCard 
+                        icon={<FaMapMarkerAlt />}
+                        count={stats?.stations.count ?? 0}
+                        label={stats?.stations.label ?? "ESTACIONES"}
+                        tag={stats?.stations.trend}
+                        tagColor="green"
+                        statusText={stats?.stations.statusText ?? "Estado desconocido"}
+                        borderColor="#3b82f6"
+                    />
+                    <StatCard 
+                        icon={<FaSeedling />}
+                        count={stats?.cultives.count ?? 0}
+                        label={stats?.cultives.label ?? "CULTIVOS"}
+                        tag={stats?.cultives.tag}
+                        tagColor="blue"
+                        statusText={stats?.cultives.statusText ?? "Estado desconocido"}
+                        borderColor="#10b981"
+                    />
+                    <StatCard 
+                        icon={<FaLeaf />}
+                        count={stats?.fenologics.count ?? 0}
+                        label={stats?.fenologics.label ?? "FENOLOGÍAS"}
+                        tag={stats?.fenologics.tag}
+                        tagColor="red"
+                        statusText={stats?.fenologics.statusText ?? "Estado desconocido"}
+                        borderColor="#8b5cf6"
+                    />
                 </div>
+
+                <ModuleLinks links={moduleLinks} />
+
+                <HeatMap />
+            </div>
+
+            <div className="dashboard-sidebar-content">
+                <ActivityFeed activities={recentActivities} />
             </div>
         </div>
     );
