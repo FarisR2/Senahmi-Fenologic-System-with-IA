@@ -1,54 +1,54 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { BaseService } from '../common/services/base.service';
-import { Analytic } from './interfaces/analytic.interface';
+import { Analytic as AnalyticEntity } from './entities/analytic.entity';
 import { AnalyticDto } from './dto/create-analytic.dto';
 import { UpdateAnalyticDto } from './dto/update-analytic.dto';
-import { v4 as uuid } from 'uuid';
 import { FenologicService } from '../fenologic/fenologic.service';
 import { StationService } from '../station/station.service';
 import { CultiveService } from '../cultive/cultive.service';
 
 @Injectable()
-export class AnalyticService extends BaseService<Analytic> {
+export class AnalyticService extends BaseService<AnalyticEntity> {
     constructor(
+        @InjectRepository(AnalyticEntity)
+        private readonly analyticRepository: Repository<AnalyticEntity>,
         private readonly fenologicService: FenologicService,
         private readonly stationService: StationService,
         private readonly cultiveService: CultiveService,
     ) {
-        super();
+        super(analyticRepository);
     }
 
-    createAnalytic(dto: AnalyticDto): Analytic {
-        const fenologicFound = this.fenologicService.findOne(dto.fenologicId);
-        const stationFound = this.stationService.findOne(dto.stationId);
-        const cultiveFound = this.cultiveService.findOne(dto.cultiveId);
+    async createAnalytic(dto: AnalyticDto): Promise<AnalyticEntity> {
+        await this.fenologicService.findOne(dto.fenologicId);
+        await this.stationService.findOne(dto.stationId);
+        await this.cultiveService.findOne(dto.cultiveId);
 
-        const newAnalytic: Analytic = {
-            id: uuid(),
+        const newAnalytic = this.analyticRepository.create({
             dateAnalytic: dto.dateAnalytic,
             tempOptMin: dto.tempOptMin,
             tempOptMax: dto.tempOptMax,
             dates: dto.dates,
             fenologicValues: dto.fenologicValues,
             fenologicId: dto.fenologicId,
-            fenologic: fenologicFound,
             cultiveId: dto.cultiveId,
-            cultive: cultiveFound,
             stationId: dto.stationId,
-            station: stationFound,
-        };
+        });
 
-        this.items.push(newAnalytic);
-
-        return newAnalytic;
+        return await this.analyticRepository.save(newAnalytic);
     }
 
-    findByStation(stationId: string): Analytic[] {
-        return this.items.filter(item => item.stationId === stationId);
+    async findByStation(stationId: number): Promise<AnalyticEntity[]> {
+        return await this.analyticRepository.find({
+            where: { stationId },
+            relations: ['fenologic', 'cultive', 'station']
+        });
     }
 
-    updateAnalytic(id: string, dto: UpdateAnalyticDto): Analytic {
-        const analytic = this.findOne(id);
+    async updateAnalytic(id: number, dto: UpdateAnalyticDto): Promise<AnalyticEntity> {
+        const analytic = await this.findOne(id);
 
         if (dto.dateAnalytic !== undefined) {
             analytic.dateAnalytic = dto.dateAnalytic;
@@ -67,17 +67,15 @@ export class AnalyticService extends BaseService<Analytic> {
         }
 
         if (dto.fenologicId) {
-            const newFenologic = this.fenologicService.findOne(dto.fenologicId);
+            await this.fenologicService.findOne(dto.fenologicId);
             analytic.fenologicId = dto.fenologicId;
-            analytic.fenologic = newFenologic;
         }
 
         if (dto.stationId) {
-            const newStation = this.stationService.findOne(dto.stationId);
+            await this.stationService.findOne(dto.stationId);
             analytic.stationId = dto.stationId;
-            analytic.station = newStation;
         }
 
-        return analytic;
+        return await this.analyticRepository.save(analytic);
     }
 }

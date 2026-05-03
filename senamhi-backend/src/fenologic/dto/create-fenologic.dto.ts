@@ -1,4 +1,4 @@
-import { IsString, IsUUID } from 'class-validator';
+import { IsString, IsNumber } from 'class-validator';
 
 export class CreateFenologicDto {
   @IsString()
@@ -7,6 +7,6 @@ export class CreateFenologicDto {
   @IsString()
   readonly abbreviation: string;
 
-  @IsUUID()
-  readonly cultiveId: string;
+  @IsNumber()
+  readonly cultiveId: number;
 }

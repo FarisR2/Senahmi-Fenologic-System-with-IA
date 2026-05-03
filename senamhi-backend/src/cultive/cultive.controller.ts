@@ -4,7 +4,7 @@ import {
   Delete,
   Get,
   Param,
-  ParseUUIDPipe,
+  ParseIntPipe,
   Post,
   Put,
 } from '@nestjs/common';
@@ -17,30 +17,30 @@ export class CultiveController {
   constructor(private readonly cultiveService: CultiveService) {}
 
   @Get()
-  findAll() {
-    return this.cultiveService.findAll();
+  async findAll() {
+    return await this.cultiveService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.cultiveService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.cultiveService.findOne(id);
   }
 
   @Post('/create-cultive')
-  createCultive(@Body() dto: CreateCultiveDto) {
-    return this.cultiveService.createCultive(dto);
+  async createCultive(@Body() dto: CreateCultiveDto) {
+    return await this.cultiveService.createCultive(dto);
   }
 
   @Put(':id')
-  updateCultive(
-    @Param('id', ParseUUIDPipe) id: string,
+  async updateCultive(
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateCultiveDto,
   ) {
-    return this.cultiveService.updateCultive(id, dto);
+    return await this.cultiveService.updateCultive(id, dto);
   }
 
   @Delete(':id')
-  deleteCultive(@Param('id', ParseUUIDPipe) id: string) {
-    return this.cultiveService.remove(id);
+  async deleteCultive(@Param('id', ParseIntPipe) id: number) {
+    return await this.cultiveService.remove(id);
   }
 }

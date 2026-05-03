@@ -1,11 +1,11 @@
-import { IsString, IsUUID, IsNumber, IsOptional, Min, Max } from 'class-validator';
+import { IsString, IsNumber, IsOptional, Min, Max } from 'class-validator';
 
 export class CreateCultiveDto {
   @IsString()
   readonly nameCultive: string;
 
-  @IsUUID()
-  readonly stationId: string;
+  @IsNumber()
+  readonly stationId: number;
 
   @IsNumber()
   @IsOptional()

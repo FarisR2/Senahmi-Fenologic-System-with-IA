@@ -1,36 +1,42 @@
 import { ConflictException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { BaseService } from '../common/services/base.service';
-import { Station } from './interfaces/station.interface';
+import { Station as StationEntity } from './entities/station.entity';
 import { CreateStationDto } from './dto/create-station.dto';
 import { UpdateStationDto } from './dto/update-station.dto';
-import { v4 as uuid } from 'uuid';
 
 @Injectable()
-export class StationService extends BaseService<Station> {
-  createStation(dto: CreateStationDto): Station {
-    // Validación de unicidad: no puede existir otra estación con el mismo nombre
-    const exists = this.items.some(
-      (s) => s.nameStation.trim().toLowerCase() === dto.nameStation.trim().toLowerCase()
-    );
+export class StationService extends BaseService<StationEntity> {
+  constructor(
+    @InjectRepository(StationEntity)
+    private readonly stationRepository: Repository<StationEntity>,
+  ) {
+    super(stationRepository);
+  }
+
+  async createStation(dto: CreateStationDto): Promise<StationEntity> {
+    const exists = await this.stationRepository.findOne({
+      where: { nameStation: dto.nameStation }
+    });
+
     if (exists) {
       throw new ConflictException(`La estación "${dto.nameStation}" ya existe.`);
     }
 
-    const newStation: Station = {
-      id: uuid(),
+    const newStation = this.stationRepository.create({
       nameStation: dto.nameStation,
-    };
+    });
 
-    this.items.push(newStation);
-    return newStation;
+    return await this.stationRepository.save(newStation);
   }
 
-  updateStation(id: string, dto: UpdateStationDto): Station {
-    const station = this.findOne(id);
+  async updateStation(id: number, dto: UpdateStationDto): Promise<StationEntity> {
+    const station = await this.findOne(id);
     if (dto.nameStation !== undefined) {
       station.nameStation = dto.nameStation;
     }
 
-    return station;
+    return await this.stationRepository.save(station);
   }
 }

@@ -4,7 +4,7 @@ import {
   Delete,
   Get,
   Param,
-  ParseUUIDPipe,
+  ParseIntPipe,
   Post,
   Put,
 } from '@nestjs/common';
@@ -17,30 +17,30 @@ export class FenologicController {
   constructor(private readonly fenologicService: FenologicService) {}
 
   @Get()
-  findAll() {
-    return this.fenologicService.findAll();
+  async findAll() {
+    return await this.fenologicService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.fenologicService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.fenologicService.findOne(id);
   }
 
   @Post('/create-fenologic')
-  createFenologic(@Body() dto: CreateFenologicDto) {
-    return this.fenologicService.createFenologic(dto);
+  async createFenologic(@Body() dto: CreateFenologicDto) {
+    return await this.fenologicService.createFenologic(dto);
   }
 
   @Put(':id')
-  updateFenologic(
-    @Param('id', ParseUUIDPipe) id: string,
+  async updateFenologic(
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateFenologicDto,
   ) {
-    return this.fenologicService.updateFenologic(id, dto);
+    return await this.fenologicService.updateFenologic(id, dto);
   }
 
   @Delete(':id')
-  deleteFenologic(@Param('id', ParseUUIDPipe) id: string) {
-    return this.fenologicService.remove(id);
+  async deleteFenologic(@Param('id', ParseIntPipe) id: number) {
+    return await this.fenologicService.remove(id);
   }
 }

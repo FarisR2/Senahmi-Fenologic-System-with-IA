@@ -1,52 +1,54 @@
 import { ConflictException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { BaseService } from '../common/services/base.service';
-import { Cultive } from './interfaces/cultive.interface';
+import { Cultive as CultiveEntity } from './entities/cultive.entity';
 import { CreateCultiveDto } from './dto/create-cultive.dto';
 import { UpdateCultiveDto } from './dto/update-cultive.dto';
-import { v4 as uuid } from 'uuid';
 import { StationService } from '../station/station.service';
 
 @Injectable()
-export class CultiveService extends BaseService<Cultive> {
+export class CultiveService extends BaseService<CultiveEntity> {
   constructor(
+    @InjectRepository(CultiveEntity)
+    private readonly cultiveRepository: Repository<CultiveEntity>,
     private readonly stationService: StationService,
   ) {
-    super();
+    super(cultiveRepository);
   }
 
-  createCultive(dto: CreateCultiveDto): Cultive {
-    const foundStation = this.stationService.findOne(dto.stationId);
+  async createCultive(dto: CreateCultiveDto): Promise<CultiveEntity> {
+    const foundStation = await this.stationService.findOne(dto.stationId);
 
     // Validación: no puede existir el mismo cultivo en la misma estación
-    const exists = this.items.some(
-      (c) =>
-        c.stationId === dto.stationId &&
-        c.nameCultive.trim().toLowerCase() === dto.nameCultive.trim().toLowerCase()
-    );
+    const exists = await this.cultiveRepository.findOne({
+      where: {
+        stationId: dto.stationId,
+        nameCultive: dto.nameCultive
+      }
+    });
+
     if (exists) {
       throw new ConflictException(
         `El cultivo "${dto.nameCultive}" ya existe en la estación "${foundStation.nameStation}".`
       );
     }
 
-    const newCultive: Cultive = {
-      id: uuid(),
+    const newCultive = this.cultiveRepository.create({
       nameCultive: dto.nameCultive,
       stationId: dto.stationId,
-      station: foundStation,
       dayInterval: dto.dayInterval ?? 7,
-    };
+    });
 
-    this.items.push(newCultive);
-    return newCultive;
+    return await this.cultiveRepository.save(newCultive);
   }
 
-  updateCultive(id: string, dto: UpdateCultiveDto): Cultive {
-    const cultive = this.findOne(id);
+  async updateCultive(id: number, dto: UpdateCultiveDto): Promise<CultiveEntity> {
+    const cultive = await this.findOne(id);
     if (dto.nameCultive !== undefined) {
       cultive.nameCultive = dto.nameCultive;
     }
 
-    return cultive;
+    return await this.cultiveRepository.save(cultive);
   }
 }

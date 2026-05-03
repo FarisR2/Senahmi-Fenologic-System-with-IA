@@ -4,7 +4,7 @@ import {
   Delete,
   Get,
   Param,
-  ParseUUIDPipe,
+  ParseIntPipe,
   Post,
   Put,
 } from '@nestjs/common';
@@ -22,40 +22,40 @@ export class StationController {
   ) { }
 
   @Get()
-  findAll() {
-    return this.stationService.findAll();
+  async findAll() {
+    return await this.stationService.findAll();
   }
 
   @Get('/stationCrop')
-  findAllCrop() {
-    return this.stationCropService.findAll();
+  async findAllCrop() {
+    return await this.stationCropService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.stationService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.stationService.findOne(id);
   }
 
   @Post('/create-station')
-  createStation(@Body() dto: CreateStationDto) {
-    return this.stationService.createStation(dto);
+  async createStation(@Body() dto: CreateStationDto) {
+    return await this.stationService.createStation(dto);
   }
 
   @Post('/create-station-cultive')
-  createStationCrop(@Body() dto: StationCropDto) {
-    return this.stationCropService.createStationCrop(dto);
+  async createStationCrop(@Body() dto: StationCropDto) {
+    return await this.stationCropService.createStationCrop(dto);
   }
 
   @Put(':id')
-  updateStation(
-    @Param('id', ParseUUIDPipe) id: string,
+  async updateStation(
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateStationDto,
   ) {
-    return this.stationService.updateStation(id, dto);
+    return await this.stationService.updateStation(id, dto);
   }
 
   @Delete(':id')
-  deleteStation(@Param('id', ParseUUIDPipe) id: string) {
-    return this.stationService.remove(id);
+  async deleteStation(@Param('id', ParseIntPipe) id: number) {
+    return await this.stationService.remove(id);
   }
 }

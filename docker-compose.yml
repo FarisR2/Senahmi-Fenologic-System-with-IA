@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: senamhi-db
+    restart: always
+    environment:
+      POSTGRES_USER: senamhi_user
+      POSTGRES_PASSWORD: senamhi_password
+      POSTGRES_DB: senamhi_fenologic
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U senamhi_user -d senamhi_fenologic"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

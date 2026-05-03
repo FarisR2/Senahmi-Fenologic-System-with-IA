@@ -1,21 +1,25 @@
 import { NotFoundException } from '@nestjs/common';
+import { Repository, FindOptionsWhere } from 'typeorm';
 
-export class BaseService<T extends { id: string }> {
-  protected items: T[] = [];
+export class BaseService<T extends { id: number }> {
+  constructor(protected readonly repository: Repository<T>) { }
 
-  findAll(): T[] {
-    return this.items;
+  async findAll(): Promise<T[]> {
+    return await this.repository.find();
   }
 
-  findOne(id: string): T {
-    const item = this.items.find((c) => c.id === id);
+  async findOne(id: number): Promise<T> {
+    const item = await this.repository.findOne({
+      where: { id } as FindOptionsWhere<T>,
+    });
+
     if (!item) throw new NotFoundException(`Resource with ID ${id} not found`);
     return item;
   }
 
-  remove(id: string) {
-    const item = this.findOne(id);
-    this.items = this.items.filter((c) => c.id !== id);
+  async remove(id: number) {
+    const item = await this.findOne(id);
+    await this.repository.remove(item);
     return {
       deleted: true,
       item,

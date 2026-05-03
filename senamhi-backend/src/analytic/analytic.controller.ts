@@ -4,7 +4,7 @@ import {
     Delete,
     Get,
     Param,
-    ParseUUIDPipe,
+    ParseIntPipe,
     Post,
     Put,
 } from '@nestjs/common';
@@ -17,35 +17,35 @@ export class AnalyticController {
     constructor(private readonly analyticService: AnalyticService) { }
 
     @Get()
-    findAll() {
-        return this.analyticService.findAll();
+    async findAll() {
+        return await this.analyticService.findAll();
     }
 
     @Get('by-station/:stationId')
-    findByStation(@Param('stationId', ParseUUIDPipe) stationId: string) {
-        return this.analyticService.findByStation(stationId);
+    async findByStation(@Param('stationId', ParseIntPipe) stationId: number) {
+        return await this.analyticService.findByStation(stationId);
     }
 
     @Get(':id')
-    findOne(@Param('id', ParseUUIDPipe) id: string) {
-        return this.analyticService.findOne(id);
+    async findOne(@Param('id', ParseIntPipe) id: number) {
+        return await this.analyticService.findOne(id);
     }
 
     @Post('/create-analytic')
-    createAnalytic(@Body() dto: AnalyticDto) {
-        return this.analyticService.createAnalytic(dto);
+    async createAnalytic(@Body() dto: AnalyticDto) {
+        return await this.analyticService.createAnalytic(dto);
     }
 
     @Put(':id')
-    updateAnalytic(
-        @Param('id', ParseUUIDPipe) id: string,
+    async updateAnalytic(
+        @Param('id', ParseIntPipe) id: number,
         @Body() dto: UpdateAnalyticDto,
     ) {
-        return this.analyticService.updateAnalytic(id, dto);
+        return await this.analyticService.updateAnalytic(id, dto);
     }
 
     @Delete(':id')
-    deleteAnalytic(@Param('id', ParseUUIDPipe) id: string) {
-        return this.analyticService.remove(id);
+    async deleteAnalytic(@Param('id', ParseIntPipe) id: number) {
+        return await this.analyticService.remove(id);
     }
 }

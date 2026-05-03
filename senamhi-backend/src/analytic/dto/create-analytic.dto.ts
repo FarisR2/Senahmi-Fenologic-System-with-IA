@@ -22,12 +22,12 @@ export class AnalyticDto {
     @IsArray()
     fenologicValues: number[][];  // Array de arrays: [semana][10 valores por semana]
 
-    @IsString()
-    fenologicId: string;
+    @IsNumber()
+    fenologicId: number;
 
-    @IsString()
-    cultiveId: string;
+    @IsNumber()
+    cultiveId: number;
 
-    @IsString()
-    stationId: string;
+    @IsNumber()
+    stationId: number;
 }
