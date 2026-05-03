@@ -2,7 +2,8 @@ import { useGet } from '../../hooks/useGet';
 import { HeroBanner } from '../../components/DashboardRedesign/HeroBanner';
 import { StatCard } from '../../components/DashboardRedesign/StatCard';
 import { ModuleLinks } from '../../components/DashboardRedesign/ModuleLinks';
-import { ActivityFeed, ActivityItem } from '../../components/DashboardRedesign/ActivityFeed';
+import { ActivityFeed } from '../../components/DashboardRedesign/ActivityFeed';
+import type { ActivityItem } from '../../components/DashboardRedesign/ActivityFeed';
 import { HeatMap } from '../../components/DashboardRedesign/HeatMap';
 
 import { 
