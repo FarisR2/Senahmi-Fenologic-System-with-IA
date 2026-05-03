@@ -3,29 +3,34 @@ import { useGet } from "../../hooks/useGet";
 import { usePost } from "../../hooks/usePost";
 import { FenologicForm } from "../../components/Forms/FenologicForm/FenologicForm";
 import { Link } from "react-router-dom";
+import { API_CONFIG } from "../../config/api.config";
 
 interface Station {
-    id: string;
+    id: number;
     nameStation: string;
 }
 
 interface Cultive {
-    id: string;
+    id: number;
     nameCultive: string;
-    stationId: string;
+    stationId: number;
 }
 
 const CreateFenologicPage = () => {
-    const [selectedStationId, setSelectedStationId] = useState<string>('');
+    const [selectedStationId, setSelectedStationId] = useState<number | string>('');
 
-    const { data: stations } = useGet<Station[]>("http://localhost:3000/station");
-    const { data: cultives } = useGet<Cultive[]>("http://localhost:3000/cultive");
-    const { post, showSuccess, error } = usePost("http://localhost:3000/fenologic/create-fenologic");
+    const { data: stations } = useGet<Station[]>(API_CONFIG.ENDPOINTS.STATION);
+    const { data: cultives } = useGet<Cultive[]>(API_CONFIG.ENDPOINTS.CULTIVE);
+    const { post, showSuccess, error } = usePost(`${API_CONFIG.ENDPOINTS.FENOLOGIC}/create-fenologic`);
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
-        const data = Object.fromEntries(formData);
+        const rawData = Object.fromEntries(formData);
+        const data = {
+            ...rawData,
+            cultiveId: parseInt(rawData.cultiveId as string, 10)
+        };
         post(data);
     };
 

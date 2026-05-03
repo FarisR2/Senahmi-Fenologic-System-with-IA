@@ -1,9 +1,10 @@
 import { StationForm } from "../../components/Forms/StationForm/StationForm";
 import { usePost } from "../../hooks/usePost";
 import { Link } from "react-router-dom";
+import { API_CONFIG } from "../../config/api.config";
 
 const CreateStationPage = () => {
-    const { post, showSuccess, error } = usePost('http://localhost:3000/station/create-station');
+    const { post, showSuccess, error } = usePost(`${API_CONFIG.ENDPOINTS.STATION}/create-station`);
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();

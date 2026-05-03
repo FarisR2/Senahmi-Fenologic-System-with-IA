@@ -15,58 +15,59 @@ import {
     ReferenceArea
 } from 'recharts';
 import './ChartPage.css';
+import { API_CONFIG } from "../../config/api.config";
 
 interface Station {
-    id: string;
+    id: number;
     nameStation: string;
 }
 
 interface Cultive {
-    id: string;
+    id: number;
     nameCultive: string;
-    stationId: string;
+    stationId: number;
     dayInterval: number;
 }
 
 interface Analytic {
-    id: string;
+    id: number;
     dateAnalytic: string;
     tempOptMin: number;
     tempOptMax: number;
     dates: string[];
     fenologicValues: number[][];
-    fenologicId: string;
+    fenologicId: number;
     fenologic: {
-        id: string;
+        id: number;
         nameFenologic: string;
         abbreviation: string;
-        cultiveId: string;
+        cultiveId: number;
     };
-    cultiveId: string;
-    stationId: string;
+    cultiveId: number;
+    stationId: number;
 }
 
 const ChartPage = () => {
-    const [selectedStationId, setSelectedStationId] = useState<string>('');
-    const [selectedCultiveId, setSelectedCultiveId] = useState<string>('');
+    const [selectedStationId, setSelectedStationId] = useState<number | string>('');
+    const [selectedCultiveId, setSelectedCultiveId] = useState<number | string>('');
 
     const [startMonth, setStartMonth] = useState<number>(new Date().getMonth() + 1);
     const [startYear, setStartYear] = useState<number>(new Date().getFullYear());
     const [endMonth, setEndMonth] = useState<number>(new Date().getMonth() + 1);
     const [endYear, setEndYear] = useState<number>(new Date().getFullYear());
 
-    const { data: stations } = useGet<Station[]>("http://localhost:3000/station");
-    const { data: cultives } = useGet<Cultive[]>("http://localhost:3000/cultive");
+    const { data: stations } = useGet<Station[]>(API_CONFIG.ENDPOINTS.STATION);
+    const { data: cultives } = useGet<Cultive[]>(API_CONFIG.ENDPOINTS.CULTIVE);
     const { data: analytics } = useGet<Analytic[]>(
-        selectedStationId ? `http://localhost:3000/analytic/by-station/${selectedStationId}` : "",
+        selectedStationId ? `${API_CONFIG.ENDPOINTS.ANALYTIC}/by-station/${selectedStationId}` : "",
         !!selectedStationId
     );
 
-    const filteredCultives = cultives?.filter(c => c.stationId === selectedStationId) || [];
+    const filteredCultives = cultives?.filter(c => c.stationId === Number(selectedStationId)) || [];
 
     const filteredAnalytics = analytics?.filter(a => {
         if (!selectedCultiveId) return false;
-        return a.cultiveId === selectedCultiveId;
+        return a.cultiveId === Number(selectedCultiveId);
     }) || [];
 
     const uniqueFenologics = Array.from(
@@ -82,7 +83,7 @@ const ChartPage = () => {
     }
 
     const { data: temperatureDataList } = useGet<TemperatureData[]>(
-        selectedStationId ? `http://localhost:3000/temperature-data/by-station/${selectedStationId}` : "",
+        selectedStationId ? `${API_CONFIG.ENDPOINTS.TEMPERATURE}/by-station/${selectedStationId}` : "",
         !!selectedStationId
     );
 

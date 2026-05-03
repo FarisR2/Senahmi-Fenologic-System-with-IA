@@ -2,15 +2,16 @@ import { Link } from "react-router-dom";
 import { CultiveForm } from "../../components/Forms/CultiveForm/CultiveForm";
 import { useGet } from "../../hooks/useGet";
 import { usePost } from "../../hooks/usePost";
+import { API_CONFIG } from "../../config/api.config";
 
 interface Station {
-    id: string;
+    id: number;
     nameStation: string;
 }
 
 const CreateCultivePage = () => {
-    const { data: stations } = useGet<Station[]>("http://localhost:3000/station");
-    const { post, showSuccess, error } = usePost("http://localhost:3000/cultive/create-cultive");
+    const { data: stations } = useGet<Station[]>(API_CONFIG.ENDPOINTS.STATION);
+    const { post, showSuccess, error } = usePost(`${API_CONFIG.ENDPOINTS.CULTIVE}/create-cultive`);
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -18,6 +19,7 @@ const CreateCultivePage = () => {
         const rawData = Object.fromEntries(formData);
         const data = {
             ...rawData,
+            stationId: parseInt(rawData.stationId as string, 10),
             dayInterval: parseInt(rawData.dayInterval as string, 10)
         };
         post(data);

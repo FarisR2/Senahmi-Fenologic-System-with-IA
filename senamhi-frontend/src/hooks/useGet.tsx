@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { API_CONFIG } from "../config/api.config";
 
 // Hook para GET automático (se ejecuta al montar el componente)
 export const useGet = <T = any,>(url: string, autoFetch: boolean = true) => {
@@ -7,11 +8,13 @@ export const useGet = <T = any,>(url: string, autoFetch: boolean = true) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    const fullUrl = url.startsWith('http') ? url : `${API_CONFIG.BASE_URL}${url}`;
+
     const fetchData = async () => {
         setError(null);
         try {
             setLoading(true);
-            const response = await axios.get(url);
+            const response = await axios.get(fullUrl);
             setData(response.data);
             return response.data;
         } catch (error: any) {
@@ -27,7 +30,7 @@ export const useGet = <T = any,>(url: string, autoFetch: boolean = true) => {
         if (autoFetch) {
             fetchData();
         }
-    }, [url, autoFetch]);
+    }, [fullUrl, autoFetch]);
 
     // Función para refetch manual
     const refetch = () => fetchData();
@@ -41,11 +44,13 @@ export const useGetLazy = <T = any,>(url: string) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    const fullUrl = url.startsWith('http') ? url : `${API_CONFIG.BASE_URL}${url}`;
+
     const get = async () => {
         setError(null);
         try {
             setLoading(true);
-            const response = await axios.get(url);
+            const response = await axios.get(fullUrl);
             setData(response.data);
             return response.data;
         } catch (error: any) {

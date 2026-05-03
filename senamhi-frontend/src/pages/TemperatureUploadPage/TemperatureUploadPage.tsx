@@ -4,17 +4,18 @@ import { usePost } from '../../hooks/usePost';
 import YearSelector from '../../components/Temperature/YearSelector/YearSelector';
 import MonthGrid from '../../components/Temperature/MonthGrid/MonthGrid';
 import './TemperatureUploadPage.css';
+import { API_CONFIG } from '../../config/api.config';
 
 interface Station {
-    id: string;
+    id: number;
     nameStation: string;
 }
 
 export const TemperatureUploadPage = () => {
-    const { data: stations } = useGet<Station[]>('http://localhost:3000/station');
-    const { post } = usePost('http://localhost:3000/temperature-data/create-temperature-data');
+    const { data: stations } = useGet<Station[]>(API_CONFIG.ENDPOINTS.STATION);
+    const { post } = usePost(`${API_CONFIG.ENDPOINTS.TEMPERATURE}/create-temperature-data`);
 
-    const [selectedStationId, setSelectedStationId] = useState<string>('');
+    const [selectedStationId, setSelectedStationId] = useState<number | string>('');
     const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
     const [uploadedMonths, setUploadedMonths] = useState<Set<number>>(new Set());
     const [uploadedFiles, setUploadedFiles] = useState<Record<number, string>>({});
@@ -29,7 +30,7 @@ export const TemperatureUploadPage = () => {
     const fetchUploadedMonths = async () => {
         try {
             const response = await fetch(
-                `http://localhost:3000/temperature-data/uploaded/${selectedStationId}/${selectedYear}`
+                `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.TEMPERATURE}/uploaded/${selectedStationId}/${selectedYear}`
             );
             if (response.ok) {
                 const data = await response.json();
@@ -48,7 +49,7 @@ export const TemperatureUploadPage = () => {
     const handleUpload = async (month: number, year: number, jsonData: any[][]) => {
         if (!selectedStationId) return;
 
-        const selectedStation = stations?.find(s => s.id === selectedStationId);
+        const selectedStation = stations?.find(s => s.id === Number(selectedStationId));
         if (!selectedStation) {
             alert('Estación no encontrada');
             throw new Error('Station not found');
@@ -104,7 +105,7 @@ export const TemperatureUploadPage = () => {
         while (precipValues.length < 31) precipValues.push(0);
 
         await post({
-            stationId: selectedStationId,
+            stationId: Number(selectedStationId),
             month,
             year,
             tempMaxValues: tempMaxValues.slice(0, 31),

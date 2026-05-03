@@ -2,30 +2,31 @@ import { useGet } from "../../hooks/useGet";
 import { usePost } from "../../hooks/usePost";
 import { AnalyticForm } from "../../components/Forms/AnalyticForm/AnalyticForm";
 import { Link } from "react-router-dom";
+import { API_CONFIG } from "../../config/api.config";
 
 interface Station {
-    id: string;
+    id: number;
     nameStation: string;
 }
 
 interface Cultive {
-    id: string;
+    id: number;
     nameCultive: string;
-    stationId: string;
+    stationId: number;
 }
 
 interface Fenologic {
-    id: string;
+    id: number;
     nameFenologic: string;
     abbreviation: string;
-    cultiveId: string;
+    cultiveId: number;
 }
 
 const CreateAnalyticPage = () => {
-    const { data: stations } = useGet<Station[]>("http://localhost:3000/station");
-    const { data: cultives } = useGet<Cultive[]>("http://localhost:3000/cultive");
-    const { data: fenologics } = useGet<Fenologic[]>("http://localhost:3000/fenologic");
-    const { post, showSuccess } = usePost("http://localhost:3000/analytic/create-analytic");
+    const { data: stations } = useGet<Station[]>(API_CONFIG.ENDPOINTS.STATION);
+    const { data: cultives } = useGet<Cultive[]>(API_CONFIG.ENDPOINTS.CULTIVE);
+    const { data: fenologics } = useGet<Fenologic[]>(API_CONFIG.ENDPOINTS.FENOLOGIC);
+    const { post, showSuccess } = usePost(`${API_CONFIG.ENDPOINTS.ANALYTIC}/create-analytic`);
 
     return (
         <>
