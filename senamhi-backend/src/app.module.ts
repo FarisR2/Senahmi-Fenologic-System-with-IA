@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { CultiveModule } from './cultive/cultive.module';
 import { StationModule } from './station/station.module';
 import { FenologicModule } from './fenologic/fenologic.module';
@@ -13,6 +14,18 @@ import { ActivityLogModule } from './activity-log/activity-log.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    EventEmitterModule.forRoot({
+      // set this to `true` to use wildcards
+      wildcard: true,
+      // the delimiter used to segment namespaces
+      delimiter: '.',
+      // set this to `true` if you want to emit the nextTick event
+      verboseMemoryLeak: false,
+      // maximum amount of listeners that can be assigned to an event
+      maxListeners: 20,
+      // show event name in memory leak message when maximum amount of listeners is exceeded
+      ignoreErrors: false,
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -38,4 +51,4 @@ import { ActivityLogModule } from './activity-log/activity-log.module';
   ],
   providers: [],
 })
-export class AppModule { }
+export class AppModule {}

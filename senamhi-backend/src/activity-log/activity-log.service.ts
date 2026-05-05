@@ -1,7 +1,10 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { OnEvent } from '@nestjs/event-emitter';
 import { ActivityLog } from './entities/activity-log.entity';
+import { CultiveCreatedEvent } from '../common/events/cultive.events';
+import { StationCreatedEvent } from '../common/events/station.events';
 
 @Injectable()
 export class ActivityLogService implements OnModuleInit {
@@ -12,6 +15,36 @@ export class ActivityLogService implements OnModuleInit {
 
   async onModuleInit() {
     await this.seedInitialLogs();
+  }
+
+  @OnEvent('cultive.created')
+  async handleCultiveCreated(payload: CultiveCreatedEvent) {
+    console.log('Event received: cultive.created', payload);
+    await this.logActivity({
+      entityType: 'CULTIVE',
+      entityId: payload.id,
+      actionType: 'CREATED',
+      status: 'EXITOSO',
+      title: `Nuevo Cultivo: ${payload.nameCultive}`,
+      description: `Se ha registrado el cultivo "${payload.nameCultive}" satisfactoriamente.`,
+    });
+  }
+
+  @OnEvent('station.created')
+  async handleStationCreated(payload: StationCreatedEvent) {
+    await this.logActivity({
+      entityType: 'STATION',
+      entityId: payload.id,
+      actionType: 'CREATED',
+      status: 'EXITOSO',
+      title: `Nueva Estación: ${payload.nameStation}`,
+      description: `La estación "${payload.nameStation}" ha sido dada de alta en el sistema.`,
+    });
+  }
+
+  @OnEvent('**')
+  handleAllEvents(payload: any, event: string) {
+    console.log(`[Event Debug] Event emitted: ${event}`, payload);
   }
 
   async getRecentLogs(limit: number = 5): Promise<ActivityLog[]> {
@@ -43,7 +76,8 @@ export class ActivityLogService implements OnModuleInit {
           actionType: 'COMPLETED',
           status: 'COMPLETADO',
           title: 'Fenología: Floración de Cultivo: Papa',
-          description: 'Se detectó el inicio masivo de floración en el clúster de Huancayo.',
+          description:
+            'Se detectó el inicio masivo de floración en el clúster de Huancayo.',
           progress: null,
           createdAt: tenMinutesAgo,
         },
@@ -53,7 +87,8 @@ export class ActivityLogService implements OnModuleInit {
           actionType: 'PROCESSING',
           status: 'PROCESAMIENTO ACTIVO',
           title: 'Fenología: Maduración de Cultivo: Maíz',
-          description: 'Análisis de coloración de grano en el valle del Mantaro.',
+          description:
+            'Análisis de coloración de grano en el valle del Mantaro.',
           progress: 80,
           createdAt: new Date(),
         },
@@ -63,10 +98,11 @@ export class ActivityLogService implements OnModuleInit {
           actionType: 'SCHEDULED',
           status: 'PROGRAMADO',
           title: 'Fenología: Siembra de Cultivo: Arroz',
-          description: 'Preparación del ciclo de monitoreo para la campaña norte.',
+          description:
+            'Preparación del ciclo de monitoreo para la campaña norte.',
           progress: null,
           createdAt: oneHourAhead, // Scheduled for future
-        }
+        },
       ];
 
       for (const log of mockLogs) {

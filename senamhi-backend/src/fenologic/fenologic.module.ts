@@ -6,12 +6,9 @@ import { CultiveModule } from '../cultive/cultive.module';
 import { Fenologic } from './entities/fenologic.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Fenologic]),
-    CultiveModule
-  ],
+  imports: [TypeOrmModule.forFeature([Fenologic]), CultiveModule],
   controllers: [FenologicController],
   providers: [FenologicService],
   exports: [FenologicService],
 })
-export class FenologicModule { }
+export class FenologicModule {}

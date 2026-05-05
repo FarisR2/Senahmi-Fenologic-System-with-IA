@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
 import { Station } from '../../station/entities/station.entity';
 import { Fenologic } from '../../fenologic/entities/fenologic.entity';
 
@@ -16,7 +23,9 @@ export class Cultive {
   @Column()
   stationId: number;
 
-  @ManyToOne(() => Station, (station) => station.cultives, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Station, (station) => station.cultives, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'stationId' })
   station: Station;
 

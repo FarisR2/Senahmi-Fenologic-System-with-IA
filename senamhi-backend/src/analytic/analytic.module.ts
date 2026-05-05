@@ -12,9 +12,9 @@ import { Analytic } from './entities/analytic.entity';
     TypeOrmModule.forFeature([Analytic]),
     FenologicModule,
     StationModule,
-    CultiveModule
+    CultiveModule,
   ],
   controllers: [AnalyticController],
   providers: [AnalyticService],
 })
-export class AnalyticModule { }
+export class AnalyticModule {}

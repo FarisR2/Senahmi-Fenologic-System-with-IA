@@ -8,10 +8,10 @@ import { Cultive } from './entities/cultive.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Cultive]),
-    forwardRef(() => StationModule)
+    forwardRef(() => StationModule),
   ],
   controllers: [CultiveController],
   providers: [CultiveService],
   exports: [CultiveService],
 })
-export class CultiveModule { }
+export class CultiveModule {}

@@ -19,7 +19,7 @@ export class StationController {
   constructor(
     private readonly stationService: StationService,
     private readonly stationCropService: StationCropService,
-  ) { }
+  ) {}
 
   @Get()
   async findAll() {

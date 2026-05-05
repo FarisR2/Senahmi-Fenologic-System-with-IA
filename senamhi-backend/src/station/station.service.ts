@@ -1,6 +1,7 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { BaseService } from '../common/services/base.service';
 import { Station as StationEntity } from './entities/station.entity';
 import { CreateStationDto } from './dto/create-station.dto';
@@ -11,27 +12,38 @@ export class StationService extends BaseService<StationEntity> {
   constructor(
     @InjectRepository(StationEntity)
     private readonly stationRepository: Repository<StationEntity>,
+    private readonly eventEmitter: EventEmitter2,
   ) {
     super(stationRepository);
   }
 
   async createStation(dto: CreateStationDto): Promise<StationEntity> {
     const exists = await this.stationRepository.findOne({
-      where: { nameStation: dto.nameStation }
+      where: { nameStation: dto.nameStation },
     });
 
     if (exists) {
-      throw new ConflictException(`La estación "${dto.nameStation}" ya existe.`);
+      throw new ConflictException(
+        `La estación "${dto.nameStation}" ya existe.`,
+      );
     }
 
     const newStation = this.stationRepository.create({
       nameStation: dto.nameStation,
     });
 
-    return await this.stationRepository.save(newStation);
+    const savedStation = await this.stationRepository.save(newStation);
+
+    // Emitir evento
+    this.eventEmitter.emit('station.created', savedStation);
+
+    return savedStation;
   }
 
-  async updateStation(id: number, dto: UpdateStationDto): Promise<StationEntity> {
+  async updateStation(
+    id: number,
+    dto: UpdateStationDto,
+  ): Promise<StationEntity> {
     const station = await this.findOne(id);
     if (dto.nameStation !== undefined) {
       station.nameStation = dto.nameStation;

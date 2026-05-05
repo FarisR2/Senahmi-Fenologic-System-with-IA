@@ -11,10 +11,10 @@ import { StationCrop } from './entities/station-crop.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Station, StationCrop]),
-    forwardRef(() => CultiveModule)
+    forwardRef(() => CultiveModule),
   ],
   controllers: [StationController],
   providers: [StationService, StationCropService],
   exports: [StationService, StationCropService],
 })
-export class StationModule { }
+export class StationModule {}

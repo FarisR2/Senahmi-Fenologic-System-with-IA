@@ -1,6 +1,7 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { BaseService } from '../common/services/base.service';
 import { Cultive as CultiveEntity } from './entities/cultive.entity';
 import { CreateCultiveDto } from './dto/create-cultive.dto';
@@ -13,6 +14,7 @@ export class CultiveService extends BaseService<CultiveEntity> {
     @InjectRepository(CultiveEntity)
     private readonly cultiveRepository: Repository<CultiveEntity>,
     private readonly stationService: StationService,
+    private readonly eventEmitter: EventEmitter2,
   ) {
     super(cultiveRepository);
   }
@@ -24,13 +26,13 @@ export class CultiveService extends BaseService<CultiveEntity> {
     const exists = await this.cultiveRepository.findOne({
       where: {
         stationId: dto.stationId,
-        nameCultive: dto.nameCultive
-      }
+        nameCultive: dto.nameCultive,
+      },
     });
 
     if (exists) {
       throw new ConflictException(
-        `El cultivo "${dto.nameCultive}" ya existe en la estación "${foundStation.nameStation}".`
+        `El cultivo "${dto.nameCultive}" ya existe en la estación "${foundStation.nameStation}".`,
       );
     }
 
@@ -40,10 +42,18 @@ export class CultiveService extends BaseService<CultiveEntity> {
       dayInterval: dto.dayInterval ?? 7,
     });
 
-    return await this.cultiveRepository.save(newCultive);
+    const savedCultive = await this.cultiveRepository.save(newCultive);
+
+    // Emitir evento para los observadores (ActivityLog, etc.)
+    this.eventEmitter.emit('cultive.created', savedCultive);
+
+    return savedCultive;
   }
 
-  async updateCultive(id: number, dto: UpdateCultiveDto): Promise<CultiveEntity> {
+  async updateCultive(
+    id: number,
+    dto: UpdateCultiveDto,
+  ): Promise<CultiveEntity> {
     const cultive = await this.findOne(id);
     if (dto.nameCultive !== undefined) {
       cultive.nameCultive = dto.nameCultive;

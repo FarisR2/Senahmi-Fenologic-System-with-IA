@@ -2,7 +2,7 @@ import { NotFoundException } from '@nestjs/common';
 import { Repository, FindOptionsWhere } from 'typeorm';
 
 export class BaseService<T extends { id: number }> {
-  constructor(protected readonly repository: Repository<T>) { }
+  constructor(protected readonly repository: Repository<T>) {}
 
   async findAll(): Promise<T[]> {
     return await this.repository.find();

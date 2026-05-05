@@ -24,26 +24,26 @@ export class FenologicService extends BaseService<FenologicEntity> {
     const duplicateName = await this.fenologicRepository.findOne({
       where: {
         cultiveId: dto.cultiveId,
-        nameFenologic: dto.nameFenologic
-      }
+        nameFenologic: dto.nameFenologic,
+      },
     });
 
     if (duplicateName) {
       throw new ConflictException(
-        `La fenología "${dto.nameFenologic}" ya existe para el cultivo "${cultiveFound.nameCultive}".`
+        `La fenología "${dto.nameFenologic}" ya existe para el cultivo "${cultiveFound.nameCultive}".`,
       );
     }
 
     const duplicateAbbr = await this.fenologicRepository.findOne({
       where: {
         cultiveId: dto.cultiveId,
-        abbreviation: dto.abbreviation
-      }
+        abbreviation: dto.abbreviation,
+      },
     });
 
     if (duplicateAbbr) {
       throw new ConflictException(
-        `La abreviatura "${dto.abbreviation}" ya existe para el cultivo "${cultiveFound.nameCultive}".`
+        `La abreviatura "${dto.abbreviation}" ya existe para el cultivo "${cultiveFound.nameCultive}".`,
       );
     }
 
@@ -56,7 +56,10 @@ export class FenologicService extends BaseService<FenologicEntity> {
     return await this.fenologicRepository.save(newFenologic);
   }
 
-  async updateFenologic(id: number, dto: UpdateFenologicDto): Promise<FenologicEntity> {
+  async updateFenologic(
+    id: number,
+    dto: UpdateFenologicDto,
+  ): Promise<FenologicEntity> {
     const fenologic = await this.findOne(id);
     if (dto.nameFenologic !== undefined) {
       fenologic.nameFenologic = dto.nameFenologic;

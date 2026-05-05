@@ -28,20 +28,20 @@ export class DashboardService {
         count: stationsCount,
         label: 'ESTACIONES CREADAS',
         trend: '+2.4%', // Mock trend as we don't have historical data to calculate this yet
-        statusText: '99.2% Tiempo de actividad operativo' // Mock status
+        statusText: '99.2% Tiempo de actividad operativo', // Mock status
       },
       cultives: {
         count: cultivesCount,
         label: 'CULTIVOS MONITOREADOS',
         tag: 'Estable', // Mock tag
-        statusText: 'Enfoque en productos clave'
+        statusText: 'Enfoque en productos clave',
       },
       fenologics: {
         count: fenologicsCount,
         label: 'FENOLOGÍAS CREADAS',
         tag: '8 Urgentes', // Mock tag
-        statusText: 'Validación de datos requerida'
-      }
+        statusText: 'Validación de datos requerida',
+      },
     };
   }
 }

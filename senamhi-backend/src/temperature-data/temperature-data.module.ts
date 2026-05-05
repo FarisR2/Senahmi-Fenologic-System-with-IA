@@ -6,12 +6,8 @@ import { StationModule } from '../station/station.module';
 import { TemperatureData } from './entities/temperature-data.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([TemperatureData]),
-    StationModule
-  ],
+  imports: [TypeOrmModule.forFeature([TemperatureData]), StationModule],
   controllers: [TemperatureDataController],
-  providers: [TemperatureDataService]
+  providers: [TemperatureDataService],
 })
-export class TemperatureDataModule { }
-
+export class TemperatureDataModule {}
