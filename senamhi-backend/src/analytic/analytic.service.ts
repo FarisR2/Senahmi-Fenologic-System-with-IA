@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { BaseService } from '../common/services/base.service';
 import { Analytic as AnalyticEntity } from './entities/analytic.entity';
 import { AnalyticDto } from './dto/create-analytic.dto';
@@ -17,6 +18,7 @@ export class AnalyticService extends BaseService<AnalyticEntity> {
     private readonly fenologicService: FenologicService,
     private readonly stationService: StationService,
     private readonly cultiveService: CultiveService,
+    private readonly eventEmitter: EventEmitter2,
   ) {
     super(analyticRepository);
   }
@@ -37,7 +39,12 @@ export class AnalyticService extends BaseService<AnalyticEntity> {
       stationId: dto.stationId,
     });
 
-    return await this.analyticRepository.save(newAnalytic);
+    const savedAnalytic = await this.analyticRepository.save(newAnalytic);
+
+    // Emitir evento
+    this.eventEmitter.emit('analytic.created', savedAnalytic);
+
+    return savedAnalytic;
   }
 
   async findByStation(stationId: number): Promise<AnalyticEntity[]> {

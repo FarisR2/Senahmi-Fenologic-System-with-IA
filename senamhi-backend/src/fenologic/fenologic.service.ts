@@ -1,6 +1,7 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { BaseService } from '../common/services/base.service';
 import { Fenologic as FenologicEntity } from './entities/fenologic.entity';
 import { CreateFenologicDto } from './dto/create-fenologic.dto';
@@ -13,6 +14,7 @@ export class FenologicService extends BaseService<FenologicEntity> {
     @InjectRepository(FenologicEntity)
     private readonly fenologicRepository: Repository<FenologicEntity>,
     private readonly cultiveService: CultiveService,
+    private readonly eventEmitter: EventEmitter2,
   ) {
     super(fenologicRepository);
   }
@@ -53,7 +55,12 @@ export class FenologicService extends BaseService<FenologicEntity> {
       cultiveId: dto.cultiveId,
     });
 
-    return await this.fenologicRepository.save(newFenologic);
+    const savedFenologic = await this.fenologicRepository.save(newFenologic);
+
+    // Emitir evento
+    this.eventEmitter.emit('fenologic.created', savedFenologic);
+
+    return savedFenologic;
   }
 
   async updateFenologic(

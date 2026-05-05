@@ -5,6 +5,9 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { ActivityLog } from './entities/activity-log.entity';
 import { CultiveCreatedEvent } from '../common/events/cultive.events';
 import { StationCreatedEvent } from '../common/events/station.events';
+import { FenologicCreatedEvent } from '../common/events/fenologic.events';
+import { AnalyticCreatedEvent } from '../common/events/analytic.events';
+import { TemperatureUploadedEvent } from '../common/events/temperature.events';
 
 @Injectable()
 export class ActivityLogService implements OnModuleInit {
@@ -39,6 +42,56 @@ export class ActivityLogService implements OnModuleInit {
       status: 'EXITOSO',
       title: `Nueva Estación: ${payload.nameStation}`,
       description: `La estación "${payload.nameStation}" ha sido dada de alta en el sistema.`,
+    });
+  }
+
+  @OnEvent('fenologic.created')
+  async handleFenologicCreated(payload: FenologicCreatedEvent) {
+    await this.logActivity({
+      entityType: 'FENOLOGIC',
+      entityId: payload.id,
+      actionType: 'CREATED',
+      status: 'EXITOSO',
+      title: `Nueva Fenología: ${payload.nameFenologic}`,
+      description: `Se ha registrado la fase fenológica "${payload.nameFenologic}".`,
+    });
+  }
+
+  @OnEvent('analytic.created')
+  async handleAnalyticCreated(payload: AnalyticCreatedEvent) {
+    await this.logActivity({
+      entityType: 'ANALYTIC',
+      entityId: payload.id,
+      actionType: 'CREATED',
+      status: 'EXITOSO',
+      title: `Nuevo Análisis Generado`,
+      description: `Se ha procesado un nuevo análisis fenológico con fecha ${payload.dateAnalytic.toLocaleDateString()}.`,
+    });
+  }
+
+  @OnEvent('temperature.uploaded')
+  async handleTemperatureUploaded(payload: TemperatureUploadedEvent) {
+    const months = [
+      'Enero',
+      'Febrero',
+      'Marzo',
+      'Abril',
+      'Mayo',
+      'Junio',
+      'Julio',
+      'Agosto',
+      'Septiembre',
+      'Octubre',
+      'Noviembre',
+      'Diciembre',
+    ];
+    await this.logActivity({
+      entityType: 'TEMPERATURE',
+      entityId: payload.id,
+      actionType: 'CREATED',
+      status: 'EXITOSO',
+      title: `Datos de Temperatura: ${months[payload.month - 1]} ${payload.year}`,
+      description: `Se han cargado satisfactoriamente los datos climáticos del mes de ${months[payload.month - 1]}.`,
     });
   }
 
