@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import apiClient from "../config/axios";
 import { API_CONFIG } from "../config/api.config";
 
 // Hook para GET automático (se ejecuta al montar el componente)
@@ -14,7 +14,7 @@ export const useGet = <T = any,>(url: string, autoFetch: boolean = true) => {
         setError(null);
         try {
             setLoading(true);
-            const response = await axios.get(fullUrl);
+            const response = await apiClient.get(url);
             setData(response.data);
             return response.data;
         } catch (error: any) {
@@ -50,7 +50,7 @@ export const useGetLazy = <T = any,>(url: string) => {
         setError(null);
         try {
             setLoading(true);
-            const response = await axios.get(fullUrl);
+            const response = await apiClient.get(url);
             setData(response.data);
             return response.data;
         } catch (error: any) {

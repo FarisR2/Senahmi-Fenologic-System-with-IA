@@ -20,7 +20,12 @@ El sistema ahora requiere una base de datos PostgreSQL. Se ha automatizado usand
 
 1.  Instalar dependencias: `npm install`
 2.  Correr en modo desarrollo: `npm run start:dev`
-3.  **Nota**: La base de datos se sincroniza automáticamente en modo dev (`synchronize: true`).
+3.  **Seed de Datos (Opcional)**: Para crear un usuario de prueba inicial:
+    ```bash
+    npm run seed
+    ```
+    *Credenciales generadas: `prueba@prueba.com` / `prueba123456`*
+4.  **Nota**: La base de datos se sincroniza automáticamente en modo dev (`synchronize: true`).
 
 ## 💻 Desarrollo Frontend (React 19)
 

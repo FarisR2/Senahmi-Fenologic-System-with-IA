@@ -1,9 +1,6 @@
 import './CultiveForm.css';
+import type { Station } from '../../../interfaces';
 
-interface Station {
-    id: string;
-    nameStation: string;
-}
 
 interface Props {
     handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
@@ -11,6 +8,7 @@ interface Props {
     stations: Station[];
     error?: string | null;
 }
+
 
 export const CultiveForm = ({ handleSubmit, showSuccess, stations, error }: Props) => {
     return (

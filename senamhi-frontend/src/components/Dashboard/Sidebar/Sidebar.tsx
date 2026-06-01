@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import {
     FaHome,
     FaMapMarkerAlt,
@@ -6,8 +6,10 @@ import {
     FaLeaf,
     FaThermometerHalf,
     FaChartBar,
-    FaChartLine
+    FaChartLine,
+    FaSignOutAlt
 } from 'react-icons/fa';
+import { useAuthStore } from '../../../store/authStore';
 import './Sidebar.css';
 
 interface SidebarProps {
@@ -16,6 +18,16 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
+    const user = useAuthStore((state) => state.user);
+    const logout = useAuthStore((state) => state.logout);
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+        onClose();
+    };
+
     const menuItems = [
         { path: '/', icon: FaHome, label: 'Dashboard', exact: true },
         { path: '/station', icon: FaMapMarkerAlt, label: 'Estaciones' },
@@ -37,6 +49,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                     </h1>
                 </div>
                 <nav className="sidebar-nav">
+                    <p className="sidebar-section-title">MENÚ PRINCIPAL</p>
                     {menuItems.map((item) => (
                         <NavLink
                             key={item.path}
@@ -51,10 +64,15 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                             <span className="sidebar-nav-label">{item.label}</span>
                         </NavLink>
                     ))}
+                    
+                    <button className="sidebar-nav-item logout-btn" onClick={handleLogout} style={{ width: '100%', border: 'none', background: 'none', cursor: 'pointer', textAlign: 'left', marginTop: 'auto' }}>
+                        <FaSignOutAlt className="sidebar-nav-icon" />
+                        <span className="sidebar-nav-label">Cerrar Sesión</span>
+                    </button>
                 </nav>
                 <div className="sidebar-footer">
-                    <p className="sidebar-footer-text">Sistema de Análisis Agroclimático</p>
-                    <p className="sidebar-footer-version">v1.0.0</p>
+                    <p className="sidebar-footer-text">{user?.firstName} {user?.lastName}</p>
+                    <p className="sidebar-footer-version">Rol: {user?.role?.toUpperCase()}</p>
                 </div>
             </aside>
         </>

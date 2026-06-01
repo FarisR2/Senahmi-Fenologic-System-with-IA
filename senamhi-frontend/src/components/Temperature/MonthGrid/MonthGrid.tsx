@@ -3,12 +3,13 @@ import './MonthGrid.css';
 
 interface MonthGridProps {
     year: number;
-    stationId: string;
+    stationId: string | number;
     uploadedMonths: Set<number>;
     uploadedFiles: Record<number, string>;
     onUploadSuccess: () => void;
     onUpload: (month: number, year: number, data: any) => Promise<void>;
 }
+
 
 const MonthGrid = ({
     year,

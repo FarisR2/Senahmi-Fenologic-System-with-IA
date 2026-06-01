@@ -1,26 +1,7 @@
 import './AnalyticForm.css';
 import { useState } from 'react';
 import { calculateWeeklyDates, datesToISOArray } from '../../../utils/dateUtils';
-
-interface Station {
-  id: number;
-  nameStation: string;
-}
-
-interface Cultive {
-  id: number;
-  nameCultive: string;
-  stationId: number;
-  dayInterval: number;
-}
-
-interface Fenologic {
-  id: number;
-  nameFenologic: string;
-  abbreviation: string;
-  cultiveId: number;
-
-}
+import type { Station, Cultive, Fenologic } from '../../../interfaces';
 
 interface Props {
   onPost: (data: any) => Promise<void>;
@@ -45,11 +26,13 @@ export const AnalyticForm = ({ onPost, showSuccess, stations, cultives, fenologi
   });
 
   // Week tracking per fenologic ID (cada fenología tiene su propio límite de 10)
-  const [weeksPerFenologic, setWeeksPerFenologic] = useState<Record<string, number>>({});
+  const [weeksPerFenologic, setWeeksPerFenologic] = useState<Record<number, number>>({});
   const MAX_WEEKS = 10;
 
   // Step 2: Selected phenological value
-  const [selectedFenologicId, setSelectedFenologicId] = useState<string | number>('');
+  const [selectedFenologicId, setSelectedFenologicId] = useState<number | ''>('');
+
+
 
   // Step 3: Week count
   const [weekCount, setWeekCount] = useState<number>(0);
@@ -103,14 +86,14 @@ export const AnalyticForm = ({ onPost, showSuccess, stations, cultives, fenologi
   };
 
   // Step 2 -> Step 3: Seleccionar fenología
-  const handleSelectFenologic = (fenologicId: string) => {
+  const handleSelectFenologic = (fenologicId: number) => {
     setSelectedFenologicId(fenologicId);
     setCurrentStep('count');
   };
 
   // Step 3 -> Step 4: Ingresar cantidad de semanas
   const handleSetWeekCount = () => {
-    const currentWeeks = weeksPerFenologic[selectedFenologicId] || 0;
+    const currentWeeks = selectedFenologicId !== '' ? weeksPerFenologic[selectedFenologicId] || 0 : 0;
     const availableWeeks = MAX_WEEKS - currentWeeks;
 
     if (weekCount > 0 && weekCount <= availableWeeks) {
@@ -164,10 +147,12 @@ export const AnalyticForm = ({ onPost, showSuccess, stations, cultives, fenologi
       console.log('Datos guardados exitosamente');
 
       // Actualizar contador de semanas para esta fenología específica
-      setWeeksPerFenologic(prev => ({
-        ...prev,
-        [selectedFenologicId]: (prev[selectedFenologicId] || 0) + weekCount
-      }));
+      if (selectedFenologicId !== '') {
+        setWeeksPerFenologic(prev => ({
+          ...prev,
+          [selectedFenologicId]: (prev[selectedFenologicId] || 0) + weekCount
+        }));
+      }
 
       // Resetear formulario a Step 2
       setSelectedFenologicId('');
@@ -175,11 +160,12 @@ export const AnalyticForm = ({ onPost, showSuccess, stations, cultives, fenologi
       setRowDates([]);
       setRowValues([]);
       setCurrentStep('select');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al guardar:', error);
       alert(`Error al guardar los datos: ${error.message || error}`);
     }
   };
+
 
   // Volver a Step 1
   const handleBackToBasic = () => {
@@ -358,7 +344,7 @@ export const AnalyticForm = ({ onPost, showSuccess, stations, cultives, fenologi
       )}
 
       {/* STEP 3: Choose Week Count */}
-      {currentStep === 'count' && (
+      {currentStep === 'count' && selectedFenologicId !== '' && (
         <div className="week-count-selection">
           <button type="button" onClick={handleBackToSelect} className="back-button">
             ← Volver a selección
@@ -389,6 +375,7 @@ export const AnalyticForm = ({ onPost, showSuccess, stations, cultives, fenologi
           </button>
         </div>
       )}
+
 
       {/* STEP 4: Data Entry Grid */}
       {currentStep === 'entry' && (
