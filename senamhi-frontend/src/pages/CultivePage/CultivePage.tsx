@@ -3,13 +3,11 @@ import { CultiveForm } from "../../components/Forms/CultiveForm/CultiveForm";
 import { useGet } from "../../hooks/useGet";
 import { usePost } from "../../hooks/usePost";
 import { API_CONFIG } from "../../config/api.config";
+import type { Station } from "../../interfaces";
 
-interface Station {
-    id: number;
-    nameStation: string;
-}
 
 const CreateCultivePage = () => {
+
     const { data: stations } = useGet<Station[]>(API_CONFIG.ENDPOINTS.STATION);
     const { post, showSuccess, error } = usePost(`${API_CONFIG.ENDPOINTS.CULTIVE}/create-cultive`);
 

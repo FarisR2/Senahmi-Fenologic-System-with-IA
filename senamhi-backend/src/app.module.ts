@@ -6,6 +6,9 @@ import { StationModule } from './station/station.module';
 import { FenologicModule } from './fenologic/fenologic.module';
 import { AnalyticModule } from './analytic/analytic.module';
 import { TemperatureDataModule } from './temperature-data/temperature-data.module';
+import { UserModule } from './user/user.module';
+import { InvitationTokenModule } from './invitation-token/invitation-token.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -31,6 +34,9 @@ import { TemperatureDataModule } from './temperature-data/temperature-data.modul
     FenologicModule,
     AnalyticModule,
     TemperatureDataModule,
+    UserModule,
+    InvitationTokenModule,
+    AuthModule,
   ],
   providers: [],
 })
