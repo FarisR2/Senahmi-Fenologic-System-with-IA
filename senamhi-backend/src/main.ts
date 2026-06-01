@@ -7,9 +7,12 @@ async function bootstrap() {
 
   // Habilitar CORS para permitir peticiones desde el frontend
   app.enableCors({
-    origin: ['http://localhost:5173', 'http://localhost:5174'], // Puertos comunes de Vite
+    origin: '*', // En desarrollo podemos ser más permisivos
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
+    allowedHeaders: 'Content-Type, Accept, Authorization',
   });
+
 
   app.useGlobalPipes(
     new ValidationPipe({

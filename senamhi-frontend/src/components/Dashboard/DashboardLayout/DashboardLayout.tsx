@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
+import { Outlet } from 'react-router-dom';
 import Sidebar from '../Sidebar/Sidebar';
 import Navbar from '../Navbar/Navbar';
 import './DashboardLayout.css';
 
 interface DashboardLayoutProps {
-    children: ReactNode;
+    children?: ReactNode;
 }
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
@@ -20,7 +21,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             <div className="dashboard-main">
                 <Navbar onToggleSidebar={toggleSidebar} />
                 <main className="dashboard-content">
-                    {children}
+                    {children || <Outlet />}
                 </main>
             </div>
         </div>
@@ -28,3 +29,4 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 };
 
 export default DashboardLayout;
+

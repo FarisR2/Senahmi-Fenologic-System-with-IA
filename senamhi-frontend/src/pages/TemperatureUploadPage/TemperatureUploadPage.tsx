@@ -5,13 +5,11 @@ import YearSelector from '../../components/Temperature/YearSelector/YearSelector
 import MonthGrid from '../../components/Temperature/MonthGrid/MonthGrid';
 import './TemperatureUploadPage.css';
 import { API_CONFIG } from '../../config/api.config';
+import type { Station } from '../../interfaces';
 
-interface Station {
-    id: number;
-    nameStation: string;
-}
 
 export const TemperatureUploadPage = () => {
+
     const { data: stations } = useGet<Station[]>(API_CONFIG.ENDPOINTS.STATION);
     const { post } = usePost(`${API_CONFIG.ENDPOINTS.TEMPERATURE}/create-temperature-data`);
 

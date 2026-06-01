@@ -11,43 +11,15 @@ import {
   Legend,
   ResponsiveContainer,
   Label,
-  Area,
   ReferenceArea
 } from 'recharts';
 import './ChartPage.css';
 import { API_CONFIG } from "../../config/api.config";
+import type { Station, Cultive, Analytic, TemperatureData } from "../../interfaces";
 
-interface Station {
-  id: number;
-  nameStation: string;
-}
-
-interface Cultive {
-  id: number;
-  nameCultive: string;
-  stationId: number;
-  dayInterval: number;
-}
-
-interface Analytic {
-  id: number;
-  dateAnalytic: string;
-  tempOptMin: number;
-  tempOptMax: number;
-  dates: string[];
-  fenologicValues: number[][];
-  fenologicId: number;
-  fenologic: {
-    id: number;
-    nameFenologic: string;
-    abbreviation: string;
-    cultiveId: number;
-  };
-  cultiveId: number;
-  stationId: number;
-}
 
 const ChartPage = () => {
+
   const [selectedStationId, setSelectedStationId] = useState<number | string>('');
   const [selectedCultiveId, setSelectedCultiveId] = useState<number | string>('');
 
@@ -74,15 +46,8 @@ const ChartPage = () => {
     new Set(filteredAnalytics.map(a => a.fenologic.abbreviation))
   );
 
-  interface TemperatureData {
-    month: number;
-    year: number;
-    tempMaxValues: number[];
-    tempMinValues: number[];
-    precipValues: number[];
-  }
-
   const { data: temperatureDataList } = useGet<TemperatureData[]>(
+
     selectedStationId ? `${API_CONFIG.ENDPOINTS.TEMPERATURE}/by-station/${selectedStationId}` : "",
     !!selectedStationId
   );

@@ -6,12 +6,13 @@ import './MonthUploadCard.css';
 interface MonthUploadCardProps {
     month: number;
     year: number;
-    stationId: string;
+    stationId: string | number;
     isUploaded: boolean;
     fileName?: string;
     onUploadSuccess: () => void;
     onUpload: (month: number, year: number, data: any) => Promise<void>;
 }
+
 
 const MONTH_NAMES = [
     'ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO',
