@@ -7,6 +7,7 @@ import { FenologicModule } from './fenologic/fenologic.module';
 import { AnalyticModule } from './analytic/analytic.module';
 import { TemperatureDataModule } from './temperature-data/temperature-data.module';
 import { UserModule } from './user/user.module';
+import { InvitationTokenModule } from './invitation-token/invitation-token.module';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
@@ -34,6 +35,7 @@ import { AuthModule } from './auth/auth.module';
     AnalyticModule,
     TemperatureDataModule,
     UserModule,
+    InvitationTokenModule,
     AuthModule,
   ],
   providers: [],

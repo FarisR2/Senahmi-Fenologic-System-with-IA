@@ -7,9 +7,12 @@ import {
     FaThermometerHalf,
     FaChartBar,
     FaChartLine,
-    FaSignOutAlt
+    FaSignOutAlt,
+    FaTicketAlt,
+    FaUsers
 } from 'react-icons/fa';
 import { useAuthStore } from '../../../store/authStore';
+import { Role } from '../../../interfaces';
 import './Sidebar.css';
 
 interface SidebarProps {
@@ -28,6 +31,8 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         onClose();
     };
 
+    const isAdmin = user?.role === Role.ADMIN;
+
     const menuItems = [
         { path: '/', icon: FaHome, label: 'Dashboard', exact: true },
         { path: '/station', icon: FaMapMarkerAlt, label: 'Estaciones' },
@@ -36,6 +41,11 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         { path: '/temperature', icon: FaThermometerHalf, label: 'Temperaturas' },
         { path: '/analytic', icon: FaChartBar, label: 'Analíticos' },
         { path: '/chart', icon: FaChartLine, label: 'Gráficos' },
+    ];
+
+    const adminItems = [
+        { path: '/admin/tokens', icon: FaTicketAlt, label: 'Tokens' },
+        { path: '/admin/users', icon: FaUsers, label: 'Usuarios' },
     ];
 
     return (
@@ -64,6 +74,25 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                             <span className="sidebar-nav-label">{item.label}</span>
                         </NavLink>
                     ))}
+
+                    {isAdmin && (
+                        <>
+                            <p className="sidebar-section-title" style={{ marginTop: '20px' }}>ADMINISTRACIÓN</p>
+                            {adminItems.map((item) => (
+                                <NavLink
+                                    key={item.path}
+                                    to={item.path}
+                                    className={({ isActive }) =>
+                                        `sidebar-nav-item ${isActive ? 'sidebar-nav-item-active' : ''}`
+                                    }
+                                    onClick={onClose}
+                                >
+                                    <item.icon className="sidebar-nav-icon" />
+                                    <span className="sidebar-nav-label">{item.label}</span>
+                                </NavLink>
+                            ))}
+                        </>
+                    )}
                     
                     <button className="sidebar-nav-item logout-btn" onClick={handleLogout} style={{ width: '100%', border: 'none', background: 'none', cursor: 'pointer', textAlign: 'left', marginTop: 'auto' }}>
                         <FaSignOutAlt className="sidebar-nav-icon" />

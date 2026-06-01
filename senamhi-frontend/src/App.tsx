@@ -9,6 +9,9 @@ import DashboardLayout from './components/Dashboard/DashboardLayout/DashboardLay
 import LoginPage from './pages/LoginPage/LoginPage';
 import RegisterPage from './pages/RegisterPage/RegisterPage';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
+import AdminRoute from './components/ProtectedRoute/AdminRoute';
+import TokenManagementPage from './pages/Admin/TokenManagementPage';
+import UserManagementPage from './pages/Admin/UserManagementPage';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 function App() {
@@ -30,6 +33,12 @@ function App() {
             <Route path="/analytic" element={<CreateAnalyticPage />} />
             <Route path="/create-analytic" element={<CreateAnalyticPage />} />
             <Route path="/chart" element={<ChartPage />} />
+
+            {/* Rutas de Admin */}
+            <Route element={<AdminRoute />}>
+              <Route path="/admin/tokens" element={<TokenManagementPage />} />
+              <Route path="/admin/users" element={<UserManagementPage />} />
+            </Route>
           </Route>
         </Route>
 

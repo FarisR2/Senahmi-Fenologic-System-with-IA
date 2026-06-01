@@ -1,0 +1,115 @@
+.admin-page {
+  padding: 20px;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.admin-header h1 {
+  margin: 0;
+  font-size: 24px;
+  color: #1a202c;
+}
+
+.admin-header p {
+  margin: 5px 0 0;
+  color: #718096;
+}
+
+.generate-btn {
+  background-color: #3182ce;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.generate-btn:hover {
+  background-color: #2b6cb0;
+}
+
+.generate-btn:disabled {
+  background-color: #a0aec0;
+}
+
+.admin-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.admin-table th {
+  background-color: #f8fafc;
+  padding: 15px 20px;
+  font-weight: 600;
+  color: #4a5568;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.admin-table td {
+  padding: 15px 20px;
+  color: #2d3748;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.token-cell code {
+  background-color: #f1f5f9;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: monospace;
+  color: #3182ce;
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-badge.active {
+  background-color: #c6f6d5;
+  color: #22543d;
+}
+
+.status-badge.used {
+  background-color: #fed7d7;
+  color: #822727;
+}
+
+.role-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.role-badge.admin {
+  background-color: #e9d8fd;
+  color: #553c9a;
+}
+
+.role-badge.user {
+  background-color: #bee3f8;
+  color: #2a4365;
+}
+
+.empty-row {
+  text-align: center;
+  padding: 40px !important;
+  color: #a0aec0;
+}
