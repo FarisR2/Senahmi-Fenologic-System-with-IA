@@ -2,7 +2,7 @@
 
 Este documento detalla los pasos para poner en marcha el sistema y las reglas de contribución para mantener la calidad arquitectónica.
 
-## 🚀 Inicio Rápido (Infraestructura)
+##  Inicio Rápido (Infraestructura)
 
 El sistema ahora requiere una base de datos PostgreSQL. Se ha automatizado usando Docker.
 
@@ -27,13 +27,13 @@ El sistema ahora requiere una base de datos PostgreSQL. Se ha automatizado usand
     *Credenciales generadas: `prueba@prueba.com` / `prueba123456`*
 4.  **Nota**: La base de datos se sincroniza automáticamente en modo dev (`synchronize: true`).
 
-## 💻 Desarrollo Frontend (React 19)
+##  Desarrollo Frontend (React 19)
 
 1.  Instalar dependencias: `npm install`
 2.  Correr: `npm run dev`
 3.  **Configuración API**: Todas las llamadas deben usar `API_CONFIG` de `src/config/api.config.ts`. No uses URLs hardcoded.
 
-## 📜 Flujo de Trabajo (Git & Ramas)
+##  Flujo de Trabajo (Git & Ramas)
 
 Para mantener la rama `main` siempre funcional, seguiremos este flujo:
 
@@ -47,7 +47,7 @@ Para mantener la rama `main` siempre funcional, seguiremos este flujo:
     ```
 3.  **Merge**: Solo una vez verificado que todo funciona (tests pasando y compilación exitosa), se mezcla a `main`.
 
-## 🛡️ Seguridad
+##  Seguridad
 
 - **NUNCA** subas archivos `.env` al repositorio. Están incluidos en `.gitignore`.
 - Usa siempre `.env.example` para documentar qué variables son necesarias.
