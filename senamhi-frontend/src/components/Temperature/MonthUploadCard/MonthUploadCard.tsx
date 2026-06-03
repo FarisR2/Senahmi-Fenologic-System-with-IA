@@ -33,7 +33,7 @@ const MonthUploadCard = ({
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file || !stationId) {
-            alert('Por favor selecciona una estación primero');
+            alert('Por favor selecciona una estación o el modo masivo primero');
             return;
         }
 
