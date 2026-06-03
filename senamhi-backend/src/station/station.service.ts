@@ -15,6 +15,24 @@ export class StationService extends BaseService<StationEntity> {
     super(stationRepository);
   }
 
+  async findOrCreateByName(name: string): Promise<StationEntity> {
+    const normalize = (n: string) => n.toLowerCase().trim().replace(/\./g, '').replace(/\s+/g, ' ');
+    const normalizedName = normalize(name);
+
+    const allStations = await this.stationRepository.find();
+    const existing = allStations.find(s => normalize(s.nameStation) === normalizedName);
+
+    if (existing) {
+      return existing;
+    }
+
+    const newStation = this.stationRepository.create({
+      nameStation: name,
+    });
+
+    return await this.stationRepository.save(newStation);
+  }
+
   async createStation(dto: CreateStationDto): Promise<StationEntity> {
     const exists = await this.stationRepository.findOne({
       where: { nameStation: dto.nameStation }

@@ -12,6 +12,7 @@ export const TemperatureUploadPage = () => {
 
     const { data: stations } = useGet<Station[]>(API_CONFIG.ENDPOINTS.STATION);
     const { post } = usePost(`${API_CONFIG.ENDPOINTS.TEMPERATURE}/create-temperature-data`);
+    const { post: postBulk } = usePost(`${API_CONFIG.ENDPOINTS.TEMPERATURE}/create-bulk-temperature-data`);
 
     const [selectedStationId, setSelectedStationId] = useState<number | string>('');
     const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
@@ -19,13 +20,19 @@ export const TemperatureUploadPage = () => {
     const [uploadedFiles, setUploadedFiles] = useState<Record<number, string>>({});
     const [refreshKey, setRefreshKey] = useState(0);
 
+    const isBulkMode = selectedStationId === 'BULK';
+
     useEffect(() => {
-        if (selectedStationId && selectedYear) {
+        if (selectedStationId && selectedYear && !isBulkMode) {
             fetchUploadedMonths();
+        } else if (isBulkMode) {
+            setUploadedMonths(new Set());
+            setUploadedFiles({});
         }
-    }, [selectedStationId, selectedYear, refreshKey]);
+    }, [selectedStationId, selectedYear, refreshKey, isBulkMode]);
 
     const fetchUploadedMonths = async () => {
+        if (isBulkMode) return;
         try {
             const response = await fetch(
                 `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.TEMPERATURE}/uploaded/${selectedStationId}/${selectedYear}`
@@ -47,17 +54,37 @@ export const TemperatureUploadPage = () => {
     const handleUpload = async (month: number, year: number, jsonData: any[][]) => {
         if (!selectedStationId) return;
 
+        if (isBulkMode) {
+            await handleBulkUpload(month, year, jsonData);
+            return;
+        }
+
         const selectedStation = stations?.find(s => s.id === Number(selectedStationId));
         if (!selectedStation) {
             alert('Estación no encontrada');
             throw new Error('Station not found');
         }
 
+        const stationData = extractStationData(jsonData, selectedStation.nameStation);
+        if (!stationData) {
+            alert(`No se encontró la estación "${selectedStation.nameStation}" en el Excel`);
+            throw new Error('Station not found in Excel');
+        }
+
+        await post({
+            stationId: Number(selectedStationId),
+            month,
+            year,
+            ...stationData
+        });
+    };
+
+    const extractStationData = (jsonData: any[][], stationName: string) => {
         let stationColIndex = -1;
-        for (let row = 0; row < jsonData.length; row++) {
+        for (let row = 0; row < Math.min(jsonData.length, 10); row++) { 
             for (let col = 0; col < jsonData[row]?.length; col++) {
                 const cellValue = jsonData[row][col];
-                if (cellValue && cellValue.toString().includes(selectedStation.nameStation)) {
+                if (cellValue && cellValue.toString().toUpperCase().trim().includes(stationName.toUpperCase().trim())) {
                     stationColIndex = col;
                     break;
                 }
@@ -65,16 +92,15 @@ export const TemperatureUploadPage = () => {
             if (stationColIndex !== -1) break;
         }
 
-        if (stationColIndex === -1) {
-            alert(`No se encontró la estación "${selectedStation.nameStation}" en el Excel`);
-            throw new Error('Station not found in Excel');
-        }
+        if (stationColIndex === -1) return null;
 
         let ppColIndex = -1;
         const startSearchCol = stationColIndex + 2;
-        for (let row = 0; row < jsonData.length; row++) {
-            for (let col = startSearchCol; col < jsonData[row]?.length; col++) {
-                const cellValue = jsonData[row][col];
+        for (let r = 0; r < Math.min(jsonData.length, 15); r++) {
+            const rowData = jsonData[r];
+            if (!rowData) continue;
+            for (let col = startSearchCol; col < rowData.length; col++) {
+                const cellValue = rowData[col];
                 if (cellValue && cellValue.toString().toUpperCase().trim() === 'PP') {
                     ppColIndex = col;
                     break;
@@ -102,14 +128,44 @@ export const TemperatureUploadPage = () => {
         while (tempMinValues.length < 31) tempMinValues.push(0);
         while (precipValues.length < 31) precipValues.push(0);
 
-        await post({
-            stationId: Number(selectedStationId),
-            month,
-            year,
+        return {
             tempMaxValues: tempMaxValues.slice(0, 31),
             tempMinValues: tempMinValues.slice(0, 31),
             precipValues: precipValues.slice(0, 31),
+        };
+    };
+
+    const handleBulkUpload = async (month: number, year: number, jsonData: any[][]) => {
+        const stationsData: any[] = [];
+        const headerRowIndex = 2; 
+        const headerRow = jsonData[headerRowIndex] || [];
+        
+        for (let col = 1; col < headerRow.length; col++) {
+            const cellValue = headerRow[col];
+            if (cellValue && typeof cellValue === 'string' && !['PP', 'FECHA', 'DIA', 'TOTAL'].includes(cellValue.toUpperCase())) {
+                const stationName = cellValue.trim();
+                const data = extractStationData(jsonData, stationName);
+                if (data) {
+                    stationsData.push({
+                        stationName,
+                        ...data
+                    });
+                }
+            }
+        }
+
+        if (stationsData.length === 0) {
+            alert('No se detectaron estaciones en el Excel');
+            return;
+        }
+
+        await postBulk({
+            month,
+            year,
+            stationsData
         });
+        
+        alert(`Carga masiva completada: ${stationsData.length} estaciones procesadas.`);
     };
 
     const handleUploadSuccess = () => {
@@ -123,7 +179,6 @@ export const TemperatureUploadPage = () => {
                 <p>Selecciona una estación y año, luego carga los archivos Excel para cada mes.</p>
             </div>
 
-            {/* Station Selector */}
             <div className="station-selector-section">
                 <label htmlFor="station" className="station-label">
                     Estación:
@@ -135,11 +190,16 @@ export const TemperatureUploadPage = () => {
                     onChange={(e) => setSelectedStationId(e.target.value)}
                 >
                     <option value="">Selecciona una estación</option>
-                    {stations?.map(station => (
-                        <option key={station.id} value={station.id}>
-                            {station.nameStation}
-                        </option>
-                    ))}
+                    <option value="BULK" style={{ fontWeight: 'bold', color: '#27ae60' }}>
+                        📦 TODAS LAS ESTACIONES (CARGA MASIVA)
+                    </option>
+                    <optgroup label="Estaciones Individuales">
+                        {stations?.map(station => (
+                            <option key={station.id} value={station.id}>
+                                {station.nameStation}
+                            </option>
+                        ))}
+                    </optgroup>
                 </select>
             </div>
 
