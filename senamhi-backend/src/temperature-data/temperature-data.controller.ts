@@ -2,6 +2,7 @@ import { Controller, Get, Post, Put, Delete, Param, Body, ParseIntPipe } from '@
 import { TemperatureDataService } from './temperature-data.service';
 import { CreateTemperatureDataDto } from './dto/create-temperature-data.dto';
 import { UpdateTemperatureDataDto } from './dto/update-temperature-data.dto';
+import { CreateBulkTemperatureDataDto } from './dto/create-bulk-temperature-data.dto';
 
 @Controller('temperature-data')
 export class TemperatureDataController {
@@ -33,6 +34,11 @@ export class TemperatureDataController {
     @Post('create-temperature-data')
     async create(@Body() dto: CreateTemperatureDataDto) {
         return await this.temperatureDataService.createTemperatureData(dto);
+    }
+
+    @Post('create-bulk-temperature-data')
+    async createBulk(@Body() dto: CreateBulkTemperatureDataDto) {
+        return await this.temperatureDataService.createBulkTemperatureData(dto);
     }
 
     @Put(':id')

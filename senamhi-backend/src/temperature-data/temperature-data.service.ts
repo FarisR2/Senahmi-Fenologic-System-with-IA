@@ -17,6 +17,14 @@ export class TemperatureDataService {
     async createTemperatureData(dto: CreateTemperatureDataDto): Promise<TemperatureDataEntity> {
         await this.stationService.findOne(dto.stationId);
 
+        const existing = await this.findByStationAndMonth(dto.stationId, dto.month, dto.year);
+        if (existing) {
+            existing.tempMaxValues = dto.tempMaxValues;
+            existing.tempMinValues = dto.tempMinValues;
+            existing.precipValues = dto.precipValues;
+            return await this.temperatureDataRepository.save(existing);
+        }
+
         const newTempData = this.temperatureDataRepository.create({
             stationId: dto.stationId,
             month: dto.month,
@@ -27,6 +35,32 @@ export class TemperatureDataService {
         });
 
         return await this.temperatureDataRepository.save(newTempData);
+    }
+
+    async createBulkTemperatureData(dto: any): Promise<any> {
+        const results: TemperatureDataEntity[] = [];
+        for (const data of dto.stationsData) {
+            const station = await this.stationService.findOrCreateByName(data.stationName);
+            
+            const existing = await this.findByStationAndMonth(station.id, dto.month, dto.year);
+            if (existing) {
+                existing.tempMaxValues = data.tempMaxValues;
+                existing.tempMinValues = data.tempMinValues;
+                existing.precipValues = data.precipValues;
+                results.push(await this.temperatureDataRepository.save(existing));
+            } else {
+                const newTempData = this.temperatureDataRepository.create({
+                    stationId: station.id,
+                    month: dto.month,
+                    year: dto.year,
+                    tempMaxValues: data.tempMaxValues,
+                    tempMinValues: data.tempMinValues,
+                    precipValues: data.precipValues,
+                });
+                results.push(await this.temperatureDataRepository.save(newTempData));
+            }
+        }
+        return { count: results.length, stations: results.map(r => r.stationId) };
     }
 
     async findAll(): Promise<TemperatureDataEntity[]> {
@@ -94,4 +128,3 @@ export class TemperatureDataService {
         await this.temperatureDataRepository.remove(item);
     }
 }
-
