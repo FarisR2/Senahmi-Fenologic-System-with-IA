@@ -18,16 +18,32 @@ import { AuthModule } from './auth/auth.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get<string>('DB_HOST', 'localhost'),
-        port: configService.get<number>('DB_PORT', 5432),
-        username: configService.get<string>('DB_USERNAME', 'senamhi_user'),
-        password: configService.get<string>('DB_PASSWORD', 'senamhi_password'),
-        database: configService.get<string>('DB_NAME', 'senamhi_fenologic'),
-        autoLoadEntities: true,
-        synchronize: true, // Solo para desarrollo
-      }),
+      useFactory: (configService: ConfigService) => {
+        const isProduction = configService.get<string>('NODE_ENV') === 'production';
+        const databaseUrl = configService.get<string>('DATABASE_URL');
+
+        if (databaseUrl) {
+          return {
+            type: 'postgres',
+            url: databaseUrl,
+            autoLoadEntities: true,
+            synchronize: !isProduction,
+            ssl: isProduction ? { rejectUnauthorized: false } : false,
+          };
+        }
+
+        return {
+          type: 'postgres',
+          host: configService.get<string>('DB_HOST', 'localhost'),
+          port: configService.get<number>('DB_PORT', 5432),
+          username: configService.get<string>('DB_USERNAME', 'senamhi_user'),
+          password: configService.get<string>('DB_PASSWORD', 'senamhi_password'),
+          database: configService.get<string>('DB_NAME', 'senamhi_fenologic'),
+          autoLoadEntities: true,
+          synchronize: !isProduction,
+          ssl: isProduction ? { rejectUnauthorized: false } : false,
+        };
+      },
     }),
     CultiveModule,
     StationModule,
