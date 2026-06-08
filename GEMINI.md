@@ -19,5 +19,6 @@ For this project, you MUST follow the rules defined in:
 - `~/.gemini/skills/typescript/SKILL.md`
 - `~/.gemini/skills/react-19/SKILL.md` (if frontend)
 
-
+## Change push
+In every push, never upload the .atl folder or the GEMINI.md file; even if there are changes to either of them, never upload them to the branches.
 
