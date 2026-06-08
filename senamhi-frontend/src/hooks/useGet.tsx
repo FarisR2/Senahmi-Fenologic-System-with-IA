@@ -44,8 +44,6 @@ export const useGetLazy = <T = any,>(url: string) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const fullUrl = url.startsWith('http') ? url : `${API_CONFIG.BASE_URL}${url}`;
-
     const get = async () => {
         setError(null);
         try {

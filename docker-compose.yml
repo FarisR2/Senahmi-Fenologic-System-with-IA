@@ -6,18 +6,58 @@ services:
     container_name: senamhi-db
     restart: always
     environment:
-      POSTGRES_USER: senamhi_user
-      POSTGRES_PASSWORD: senamhi_password
-      POSTGRES_DB: senamhi_fenologic
+      POSTGRES_USER: ${DB_USER:-senamhi_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-senamhi_password}
+      POSTGRES_DB: ${DB_NAME:-senamhi_fenologic}
     ports:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U senamhi_user -d senamhi_fenologic"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - senamhi-network
+
+  senamhi-backend:
+    build:
+      context: ./senamhi-backend
+      dockerfile: Dockerfile
+    container_name: senamhi-backend
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: ${DB_USER:-senamhi_user}
+      DB_PASSWORD: ${DB_PASSWORD:-senamhi_password}
+      DB_DATABASE: ${DB_NAME:-senamhi_fenologic}
+      JWT_SECRET: ${JWT_SECRET:-supersecret_ia_key}
+    ports:
+      - '3000:3000'
+    networks:
+      - senamhi-network
+
+  senamhi-frontend:
+    build:
+      context: ./senamhi-frontend
+      dockerfile: Dockerfile
+    container_name: senamhi-frontend
+    restart: always
+    depends_on:
+      - senamhi-backend
+    ports:
+      - '80:80'
+    networks:
+      - senamhi-network
+
+networks:
+  senamhi-network:
+    driver: bridge
 
 volumes:
   postgres_data:
